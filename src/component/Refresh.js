@@ -1,19 +1,15 @@
 import React, { Component } from 'react';
 import styled from 'styled-components'
+import store, {GETNUM} from '../redux/redux'
 
 class Refresh extends Component {
     constructor() {
         super();
-        this.handleRefresh = this.handleRefresh.bind(this);
     }
-
-    handleRefresh() {
-        window.location.reload();
-    }
-
+    
     render() {
         return (
-            <Button onClick={this.handleRefresh} type="submit" value="당첨번호 얻기" />
+            <Button type="submit" value="당첨번호 얻기" />
         );
     }
 }
