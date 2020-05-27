@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components'
+import NumChk from './checkNum'
 
 class paper extends Component {
 constructor(props) {
@@ -9,7 +10,8 @@ constructor(props) {
 }
 
 state = {
-    chkArr: this.props.num
+    chkArr: this.props.num,
+    clicked: false
 }
 
 checkIfMarked(num) {
@@ -24,13 +26,18 @@ checkNum(e) {
     e.preventDefault();
     let arr = []            
     this.setState({
-        chkArr: this.checkIfMarked(this.state.chkArr)
+        chkArr: this.checkIfMarked(this.state.chkArr),
+        clicked: !this.state.clicked
     })
+    console.log(this.state.chkArr)
     console.log(this.checkIfMarked(this.props.num))    
   }
 
     render() {
+        let propNum = this.props.num;
+        let stateNum = this.state.chkArr;
         return (                
+            this.props.num[this.props.num.length - 1] === " " || 
             this.state.chkArr[this.state.chkArr.length - 1] === " " ?
             <NumCheck onClick={this.checkNum} id={this.props.num}>
             {this.props.num > 9 ?                
@@ -45,17 +52,13 @@ checkNum(e) {
                 <span style={{padding: "0px 5.5px"}}>{this.state.chkArr}                
                 </span> 
             }
-                </Num>
+                </Num> 
         );
     }
 }
 
 export default paper;
 
-const Paper = styled.div`
-    height: 14rem;
-    width: 5rem;
-`
 const Num = styled.span`
     display: inline-block;    
     font-size: 1.2rem;
