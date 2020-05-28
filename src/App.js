@@ -3,6 +3,8 @@ import styled from 'styled-components'
 
 import Ball from './component/ball'
 import Tag from './component/nameTag'
+import * as d3 from 'd3'
+const history = require('./history.csv')
 //import Refresh from './component/Refresh'
 //import Num from './component/paper'
 
@@ -15,13 +17,23 @@ class App extends Component {
     this.getNumsByHand = this.getNumsByHand.bind(this);
     this.markNum = this.markNum.bind(this);
     this.checkNum = this.checkNum.bind(this);
+    this.getCsv = this.getCsv.bind(this);
   }
 
   state = {
     nums: [],
     test: [],
-    checker: []
+    checker: [],
+    histories: this.getCsv()
 }
+
+  getCsv() {
+    let arr = [];
+    d3.csv(history, (data) => {
+      arr.push(Object.values(data))      
+    });
+    return arr;
+  }
   num45() {
     let arr = []
     for (let i = 1; i < 46; i++) {
@@ -98,13 +110,12 @@ class App extends Component {
   }
 
   markNum(e) {
-    console.log(this.state.nums[e.currentTarget.id])    
-    let tarArr = this.state.nums[e.currentTarget.id];    
+    console.log(this.state.nums[e.target.id])    
+    let tarArr = this.state.nums[e.target.id];    
     let arr = [];
-    for (let i = 0; i < 45; i++) {
+    for (let i = 1; i <= 45; i++) {
       arr.push(i);
     }
-    this.setState({test: arr});
     if (typeof tarArr !== "undefined") {      
       let getNums = this.state.test;
       for (let i = 0; i < tarArr.length; i++) {
@@ -131,8 +142,7 @@ class App extends Component {
   
   render() {    
   return (
-    <Main>      
-      {this.state.checker}
+    <Main>            
       <Paper>
       <Tag />
       {this.state.test.map((mark, index) =>
@@ -193,28 +203,47 @@ const Button = styled.button`
 color: red;
 width: 150px;
 display: inline-block;
-position: absolute;
 bottom: 5px;
 cursor: pointer;
 `
 
 const Paper = styled.div`
+@media screen and (min-width: 480px) {
     height: 33rem;
     width: 17.5rem;
     display: inline-block;
     border: 2px solid red;
+}
+  margin: 0 auto;
+  margin-left: 50px;
+  margin-top: 50px;
+  height: 33rem;
+  width: 17.5rem;
+  display: inline-block;
+  border: 2px solid red;
 `
 
 const Contain = styled.div`
+@media screen and (min-width: 480px) {
     width: 900px;
     height: 500px;    
     margin-left: 300px;
     position: absolute;
     display: inline-block;
+}
+  width: 420px;
+  height: 500px;    
+  margin-top: 50px;  
+  margin-left: 50px;
+  display: inline-block;
 `
 const Balls = styled.div`
-width: 860px;
+@media screen and (min-width: 480px) {
+width: 855px;
 height: 120px;
+}
+width: 270px;
+height: 35px;
 border: 2px solid background-color: hsl(204, 96%, 91%);
 border-radius: 20px;
 cursor: pointer;
