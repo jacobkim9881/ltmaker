@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import Ball from './component/ball'
 import Tag from './component/nameTag'
+import CheckBox from './component/checkBx'
 import * as d3 from 'd3'
 const history = require('./history.csv')
 //import Refresh from './component/Refresh'
@@ -18,13 +19,18 @@ class App extends Component {
     this.markNum = this.markNum.bind(this);
     this.checkNum = this.checkNum.bind(this);
     this.getCsv = this.getCsv.bind(this);
+    this.menuTurn = this.menuTurn.bind(this);
+    this.checkOn = this.checkOn.bind(this);
+    this.checkInBox = this.checkInBox.bind(this);
   }
 
   state = {
     nums: [],
-    test: [],
+    paper: [],
     checker: [],
-    histories: this.getCsv()
+    histories: this.getCsv(),
+    menuOn: false,
+    itemBox: []
 }
 
   getCsv() {
@@ -39,7 +45,7 @@ class App extends Component {
     for (let i = 1; i < 46; i++) {
       arr.push(i )
     }
-    this.setState({test: arr});
+    this.setState({paper: arr});
   }
   componentDidMount() {    
     this.num45();
@@ -72,9 +78,9 @@ class App extends Component {
   }
 
   handleRefresh() {    
-    let clicked = this.state.test.filter(num => typeof num === "string")    
+    let clicked = this.state.paper.filter(num => typeof num === "string")    
     console.log(clicked)
-    console.log(this.state.test)
+    console.log(this.state.paper)
     if (clicked.length !== 0) {
       let arr = [];            
       for (let i = 0; i < 7; i++) {
@@ -117,35 +123,64 @@ class App extends Component {
       arr.push(i);
     }
     if (typeof tarArr !== "undefined") {      
-      let getNums = this.state.test;
+      let getNums = this.state.paper;
       for (let i = 0; i < tarArr.length; i++) {
         getNums.splice([tarArr[i] - 1], 1, tarArr[i] + " " )
       }
-      this.setState({test: getNums});
-      console.log(this.state.test)
+      this.setState({paper: getNums});
+      console.log(this.state.paper)
     } else {};
   }
 
   checkNum(e) {        
     e.preventDefault();
     let num = parseInt(e.currentTarget.id, 10);    
-    let arr = this.state.test;
+    let arr = this.state.paper;
     let targetNum = arr[num - 1];          
     if(typeof targetNum !== "string") {
       arr.splice(num - 1, 1, num + " ");      
-      this.setState({test: arr});      
+      this.setState({paper: arr});      
     } else {
       arr.splice(num - 1, 1, num);      
-      this.setState({test: arr});    
+      this.setState({paper: arr});    
     }
   }
   
+  menuTurn() {
+    this.setState({menuOn: !this.state.menuOn})
+  }
+
+  checkOn(e) {
+    let id = e.target.id;
+    let nums = this.state.nums;
+    let cut = nums.splice(id, 1);
+    let itemBox = this.state.itemBox.concat([cut]);
+    console.log(cut)
+    this.setState({
+      nums: nums,
+      itemBox: itemBox
+    })
+  }
+
+  checkInBox(e) {
+    let id = e.target.id;
+    let itemBox = this.state.itemBox;    
+    let cut = itemBox.splice(id, 1);    
+    let nums = this.state.nums.concat([cut]);
+    console.log(cut)
+    this.setState({
+      nums: nums,
+      itemBox: itemBox
+    })
+  } 
+
   render() {    
   return (
+    <div>
     <Main>            
       <Paper>
       <Tag />
-      {this.state.test.map((mark, index) =>
+      {this.state.paper.map((mark, index) =>
         mark[mark.length - 1] === " " ? 
         <NumCheck onClick={this.checkNum} id={mark}>
           {mark > 9 ?
@@ -169,19 +204,45 @@ class App extends Component {
       
       <Contain>
          {this.state.nums.map((arr, index) =>
-         <Balls id={index} onClick={this.markNum}>
-         {arr.map((eye, index) => <span>
-         {index !== 0 && (index + 1)%7 === 0 ?
-           <span>
-             + <Ball key={index} num={eye} /> 
-           </span>:
-         <Ball key={index} num={eye} />
-       }        
-       </span>)}
-       </Balls> 
+         <div>
+          <Balls id={index} onClick={this.markNum}>
+          {arr.map((eye, index) => <span>
+          {index !== 0 && (index + 1)%7 === 0 ?
+            <span>
+              + <Ball key={index} num={eye} /> 
+            </span>:
+          <Ball key={index} num={eye} />
+        }        
+        </span>)}
+        </Balls> 
+        <input type="checkbox" id={index} onChange={this.checkOn}/>
+       </div>
          )}
-      </Contain>
-    </Main>
+      </Contain>            
+    </Main>      
+      {this.state.menuOn ?
+      <Nav> 
+      <MyBox onClick={this.menuTurn} On> 
+      Numbers
+      </MyBox> 
+      <Items>
+        <ul>
+          {this.state.itemBox.map((arr, index) => 
+          <itemInBox>
+            {arr.map(num => 
+            <span>
+              {num + " "}
+            <input id={index} onChange={this.checkInBox} type="checkbox" value="itemInBox" />
+            </span>
+            )}
+          </itemInBox>)}
+        </ul>
+      </Items>
+      </Nav>: 
+      <MyBox onClick={this.menuTurn} Off> 
+      Numbers
+      </MyBox>}
+    </div>
   );
 }}
 
@@ -227,7 +288,7 @@ const Contain = styled.div`
 @media screen and (min-width: 480px) {
     width: 900px;
     height: 500px;    
-    margin-left: 300px;
+    margin-left: 200px;
     position: absolute;
     display: inline-block;
 }
@@ -238,6 +299,7 @@ const Contain = styled.div`
   display: inline-block;
 `
 const Balls = styled.div`
+display: inline-block;
 @media screen and (min-width: 480px) {
 width: 855px;
 height: 120px;
@@ -288,4 +350,47 @@ const NumCheck = styled.span`
         background-color: hsl(0, 100%, 100%);
         color: red;
     }
+`
+const Items = styled.div`
+  height: 100%;
+  display: inline-block;
+  position: fixed;
+  right: 0;
+  width: 300px;
+  top: 0px;
+  border-width: 0 0 0 1px;
+  border-style: solid;
+  border-color: hsl(0, 0%, 93%);
+  z-index: -1;
+`
+
+const MyBox = styled.div`
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  div {
+  writing-mode: none;
+  text-orientation: none;
+  }
+  display: inline-block;
+  position: absolute;    
+  padding-top: 10px;
+  padding-right: 10px;
+  width: 30px;
+  height: 120px;
+  border-width: 1px 1px 1px 1px;
+  border-style: solid;
+  border-color: hsl(0, 0%, 93%) hsl(0, 0%, 100%) hsl(0, 0%, 93%) hsl(0, 0%, 93%);
+  top: 50%;
+  ${props => props.Off ? 
+  "right: 0px;" : 
+  props.On ?
+  "right: 300px;" :
+  "right: 0px;"
+  }  
+`
+const Nav = styled.div`
+`
+
+const itemInBox = styled.li`
+  list-style-type: none;
 `

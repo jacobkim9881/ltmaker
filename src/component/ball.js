@@ -11,64 +11,85 @@ constructor(props) {
     this.showHistory = this.showHistory.bind(this);
 }
 state = {
-    history: [],
+    recent5: [],
     clicked: false
 }
 showHistory(e) {    
         let targ = parseInt(e.currentTarget.id);    
+        let recent5 = () => {
+            let arr = []
+            for (let i = 0; i < 5; i++) {
+                arr.push(text[i])
+            }
+            return arr;
+        }
+        let tarArrRe5 = recent5().filter(data => 
+            data.fst === targ || data.snd === targ || data.trd === targ ||
+            data.foth === targ || data.fvth === targ || data.sth === targ ||
+            data.bonus === targ
+            )
         let tarArr = text.filter(data => 
-            data.fst == targ || data.snd == targ || data.trd == targ ||
-            data.foth == targ || data.fvth == targ || data.sth == targ ||
-            data.bonus == targ
+            data.fst === targ || data.snd === targ || data.trd === targ ||
+            data.foth === targ || data.fvth === targ || data.sth === targ ||
+            data.bonus === targ
             )
         let count = tarArr.length    
         let arr = [];
-        for (let i = 0; i < tarArr.length; i++) {
+        for (let i = 0; i < tarArrRe5.length; i++) {
             let data = tarArr[i];
-            arr.push(`round :${data.round}, date: ${data.date}`)
+            arr.push(`round :${data.round}, date: ${data.date} numbers: ${data.fst}, ${data.snd}, ${data.trd}, ${data.foth}, ${data.fvth}, ${data.sth}, ${data.bonus}`)
         }
         this.setState({
-            history: arr
+            recent5: arr
         })
         console.log(arr)
         console.log(count)
 }
 
-render() {
+returnBall(color) {
+    return <Ball id={this.props.num} onClick={this.showHistory} color >
+    <Num >
+     {this.props.num}
+    </Num>                       
+    <History >{this.state.recent5.map(data =><li>{data}</li>)} </History>
+</Ball>
+}
+
+render() {    
     return (        
         this.props.num >= 40 ?        
         <Ball id={this.props.num} onClick={this.showHistory} green >
             <Num >
              {this.props.num}
             </Num>                       
-            <History >{this.state.history.map(data =><li>{data}</li>)} </History>
+            <History >{this.state.recent5.map(data =><li>{data}</li>)} </History>
         </Ball> :
         this.props.num >= 30 ?
         <Ball id={this.props.num} onClick={this.showHistory} grey>
             <Num>
              {this.props.num}
             </Num>            
-            <History >{this.state.history.map(data =><li>{data}</li>)} </History>
+            <History >{this.state.recent5.map(data =><li>{data}</li>)} </History>
         </Ball> :
         this.props.num >= 20 ?
         <Ball id={this.props.num} onClick={this.showHistory} red>
         <Num>
          {this.props.num}
         </Num>            
-        <History >{this.state.history.map(data =><li>{data}</li>)} </History>
+        <History >{this.state.recent5.map(data =><li>{data}</li>)} </History>
         </Ball> :
         this.props.num >= 10 ?
         <Ball id={this.props.num} onClick={this.showHistory} blue>
         <Num>
          {this.props.num}
         </Num>            
-        <History >{this.state.history.map(data =><li>{data}</li>)} </History>
+        <History >{this.state.recent5.map(data =><li>{data}</li>)} </History>
         </Ball> :
         <Ball id={this.props.num} onClick={this.showHistory} >  
         <Num>
          {this.props.num}
         </Num>            
-        <History >{this.state.history.map(data =><li>{data}</li>)} </History>
+        <History >{this.state.recent5.map(data =><li>{data}</li>)} </History>
         </Ball>
     )
 }
