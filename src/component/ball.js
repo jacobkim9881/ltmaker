@@ -23,21 +23,22 @@ showHistory(e) {
             }
             return arr;
         }
-        let tarArrRe5 = recent5().filter(data => 
+        let getSameNum = (arr) => arr.filter(data => 
             data.fst === targ || data.snd === targ || data.trd === targ ||
             data.foth === targ || data.fvth === targ || data.sth === targ ||
             data.bonus === targ
             )
-        let tarArr = text.filter(data => 
-            data.fst === targ || data.snd === targ || data.trd === targ ||
-            data.foth === targ || data.fvth === targ || data.sth === targ ||
-            data.bonus === targ
+        let textArr = text.filter(data => 
+            data.fst === targ
             )
-        let count = tarArr.length    
+        let count = getSameNum(text).length    
         let arr = [];
-        for (let i = 0; i < tarArrRe5.length; i++) {
-            let data = tarArr[i];
-            arr.push(`round :${data.round}, date: ${data.date} numbers: ${data.fst}, ${data.snd}, ${data.trd}, ${data.foth}, ${data.fvth}, ${data.sth}, ${data.bonus}`)
+        console.log(textArr)
+        console.log(text[0])
+        console.log(getSameNum(text))        
+        for (let i = 0; i < 4; i++) {
+            //let data = getSameNum(text)[i];
+            //arr.push(`round :${data.round}, date: ${data.date} numbers: ${data.fst}, ${data.snd}, ${data.trd}, ${data.foth}, ${data.fvth}, ${data.sth}, ${data.bonus}`)
         }
         this.setState({
             recent5: arr
@@ -135,6 +136,7 @@ const History = styled.p`
     color: black;
     z-index: 1;
     position: fixed;
+    display:none;
 `
 const Num = styled.p`
 @media screen and (min-width: 480px) {

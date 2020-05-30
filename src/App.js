@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import Ball from './component/ball'
 import Tag from './component/nameTag'
+import MixButton from './component/mixBtn'
 import CheckBox from './component/checkBx'
 import * as d3 from 'd3'
 const history = require('./history.csv')
@@ -22,6 +23,8 @@ class App extends Component {
     this.menuTurn = this.menuTurn.bind(this);
     this.checkOn = this.checkOn.bind(this);
     this.checkInBox = this.checkInBox.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
+    this.ran7 = this.ran7.bind(this);
   }
 
   state = {
@@ -30,7 +33,9 @@ class App extends Component {
     checker: [],
     histories: this.getCsv(),
     menuOn: false,
-    itemBox: []
+    itemBox: [],
+    tierBox: [],
+    tiersInItemBox: []
 }
 
   getCsv() {
@@ -52,11 +57,7 @@ class App extends Component {
   }
 
   getNum() {    
-    let arr = []
-    let yourNum = []
-    for (let i = 1; i < 46; i++) {
-      //arr.push(i)
-    }
+    let yourNum = [];
     for (let j = 0; j < 7; j++) {
       let cut = Math.trunc((Math.random() * 45)+ 1);                  
       let findS = yourNum.find(num => num === cut);      
@@ -67,68 +68,102 @@ class App extends Component {
       }      
     }    
     return yourNum;
-    //let ran2 = Math.trunc((Math.random() * 45)+ 1);
-    //let ran3 = Math.trunc((Math.random() * 45)+ 1);
-    //let ran4 = Math.trunc((Math.random() * 45)+ 1);
-    //let ran5 = Math.trunc((Math.random() * 45)+ 1);
-    //let ran6 = Math.trunc((Math.random() * 45)+ 1);
-    //let ran7 = Math.trunc((Math.random() * 45)+ 1);
-    //let pushing = this.state.nums.concat(ran + " " + ran2 + " " + ran3 + " " + ran4 + " " + ran5 + " " + ran6 + " " + ran7 + " ");
-    //this.setState({nums: pushing})
   }
 
   handleRefresh() {    
     let clicked = this.state.paper.filter(num => typeof num === "string")    
-    console.log(clicked)
-    console.log(this.state.paper)
-    if (clicked.length !== 0) {
-      let arr = [];            
-      for (let i = 0; i < 7; i++) {
-        let cut = Math.trunc((Math.random() * 45)+ 1);                  
-        let findS = arr.find(num => num === cut);    
-        if (typeof clicked[i] !== "undefined") {
-          arr.push(clicked[i]);
-        } else if(typeof findS === 'undefined') {
-          arr.push(cut);
-        } else {
-          i--
+    if (this.state.nums.length < 5) {
+      if (clicked.length !== 0) {
+        let arr = [];            
+        let tier = [];
+        for (let i = 0; i < 7; i++) {
+          let cut = Math.trunc((Math.random() * 45)+ 1);                  
+          let findS = arr.find(num => num === cut);    
+          if (typeof clicked[i] !== "undefined") {
+            arr.push(clicked[i]);
+          } else if(typeof findS === 'undefined') {
+            arr.push(cut);
+          } else {
+            i--
+          }
         }
-      }
-      let pushingCustom = this.state.nums.concat([arr])
-      this.setState({nums: pushingCustom})
-      this.num45();
-    } else {
-      let pushingRan = this.state.nums.concat([this.getNum()]);
-      this.setState({nums: pushingRan})        
+        tier.push(1);
+        let pushingCustom = this.state.nums.concat([arr]);
+        let pushingTier = this.state.tierBox.concat([tier]);
+        this.setState({
+          nums: pushingCustom,
+          tierBox: pushingTier
+        });
+        this.num45();
+      } else  {
+        let pushingRan = this.state.nums.concat([this.getNum()]);
+        let tier = [1]
+        let pushingTier = this.state.tierBox.concat([tier]);
+        this.setState({
+          nums: pushingRan,
+          tierBox: pushingTier          
+        })        
     }
-    console.log(this.state.nums)
+    }
     //store.dispatch({type: GETNUM})
     //window.location.reload();
 }
 
   getNumsByHand(e) {
     e.preventDefault();
-    let str = this.nums.value;
-    let ary = str.match(/[^,]/g);
-    let pushing = this.state.nums.concat([ary]);
-    this.setState({nums: pushing});
-    console.log(this.state.nums);    
+    if (this.state.nums.length <=5) {
+      let str = this.nums.value;
+      let ary = str.match(/[^,]/g);
+      let pushing = this.state.nums.concat([ary]);
+      this.setState({nums: pushing});
+    } else {}
+  }
+
+  ran7(e) {
+    let arr = [];
+    let ran = (num) => Math.trunc((Math.random() * num)+ 1);    
+    let nums = this.state.nums;
+    for (let i = 0; i < 7; i++) {
+      let ranFive = ran(4);            
+      if (typeof nums[ranFive] === "undefined") {
+        i--
+      } else {
+        let tarArr = nums[ranFive];        
+        let arrLen = ran(nums[ranFive].length - 1);
+        let findS = arr.find(num => num === tarArr[arrLen])
+        if (typeof tarArr[arrLen] === "undefined") {
+          i--
+        } else if (typeof findS === "undefined"){
+          arr.push(tarArr[arrLen]);
+          tarArr.splice(arrLen, 1);          
+        } else {
+          i--
+        }        
+      }      
+    }
+    let pushingRan = this.state.itemBox.concat([arr]);
+    let avg = 0;
+    for (let i = 0; i < this.state.tierBox.length; i++) {
+      avg = avg + parseInt(this.state.tierBox[i], 10) + 1;
+    }
+    avg = avg/(this.state.tierBox.length);    
+    let pushingTier = this.state.tiersInItemBox.concat(avg);
+    this.setState({
+      nums: [],
+      tierBox: [],
+      itemBox: pushingRan,
+      tiersInItemBox: pushingTier
+    })
   }
 
   markNum(e) {
-    console.log(this.state.nums[e.target.id])    
     let tarArr = this.state.nums[e.target.id];    
-    let arr = [];
-    for (let i = 1; i <= 45; i++) {
-      arr.push(i);
-    }
     if (typeof tarArr !== "undefined") {      
       let getNums = this.state.paper;
       for (let i = 0; i < tarArr.length; i++) {
         getNums.splice([tarArr[i] - 1], 1, tarArr[i] + " " )
       }
       this.setState({paper: getNums});
-      console.log(this.state.paper)
     } else {};
   }
 
@@ -154,11 +189,15 @@ class App extends Component {
     let id = e.target.id;
     let nums = this.state.nums;
     let cut = nums.splice(id, 1);
-    let itemBox = this.state.itemBox.concat([cut]);
-    console.log(cut)
+    let itemBox = this.state.itemBox.concat(cut);
+    let tierBox = this.state.tierBox;
+    let cutTier = tierBox.splice(id, 1);
+    let tiersInItemBox = this.state.tiersInItemBox.concat(cutTier);
     this.setState({
       nums: nums,
-      itemBox: itemBox
+      itemBox: itemBox,
+      tierBox: tierBox,
+      tiersInItemBox: tiersInItemBox
     })
   }
 
@@ -166,13 +205,29 @@ class App extends Component {
     let id = e.target.id;
     let itemBox = this.state.itemBox;    
     let cut = itemBox.splice(id, 1);    
-    let nums = this.state.nums.concat([cut]);
-    console.log(cut)
+    let nums = this.state.nums.concat(cut);
+    let tiersInItemBox = this.state.tiersInItemBox;
+    let cutTier = tiersInItemBox.splice(id, 1);
+    let tierBox = this.state.tierBox.concat(cutTier);
     this.setState({
       nums: nums,
-      itemBox: itemBox
+      itemBox: itemBox,
+      tierBox: tierBox,
+      tiersInItemBox: tiersInItemBox
     })
   } 
+
+  deleteItem(e) {
+    let id = e.target.id;
+    let itemBox = this.state.itemBox;    
+    itemBox.splice(id, 1);    
+    let tiersInItemBox = this.state.tiersInItemBox;
+    tiersInItemBox.splice(id, 1);
+    this.setState({
+      itemBox: itemBox,
+      tiersInItemBox: tiersInItemBox
+    });
+  }
 
   render() {    
   return (
@@ -205,6 +260,7 @@ class App extends Component {
       <Contain>
          {this.state.nums.map((arr, index) =>
          <div>
+           {this.state.tierBox[index]}
           <Balls id={index} onClick={this.markNum}>
           {arr.map((eye, index) => <span>
           {index !== 0 && (index + 1)%7 === 0 ?
@@ -216,10 +272,15 @@ class App extends Component {
         </span>)}
         </Balls> 
         <input type="checkbox" id={index} onChange={this.checkOn}/>
+        {index === 4 ? 
+        <Mix type="submit" onClick={this.ran7} name="mix" value="이 중에서 랜덤 7개 뽑기" />
+         : ""}
        </div>
          )}
       </Contain>            
     </Main>      
+
+
       {this.state.menuOn ?
       <Nav> 
       <MyBox onClick={this.menuTurn} On> 
@@ -229,12 +290,12 @@ class App extends Component {
         <ul>
           {this.state.itemBox.map((arr, index) => 
           <itemInBox>
-            {arr.map(num => 
-            <span>
-              {num + " "}
-            <input id={index} onChange={this.checkInBox} type="checkbox" value="itemInBox" />
-            </span>
-            )}
+            <li style={{listStyleType: "none"}}>
+            {this.state.tiersInItemBox[index] + " "}
+            {arr+" "}
+            <ItemInBox id={index} onChange={this.checkInBox} type="checkbox" value="itemInBox" />
+            <Del onClick={this.deleteItem}>X</Del>            
+            </li>
           </itemInBox>)}
         </ul>
       </Items>
@@ -316,6 +377,10 @@ div {
 }
 `
 
+const Mix = styled.input`
+    margin: auto;
+    display: block
+`
 
 const Num = styled.span`
     display: inline-block;    
@@ -361,16 +426,13 @@ const Items = styled.div`
   border-width: 0 0 0 1px;
   border-style: solid;
   border-color: hsl(0, 0%, 93%);
-  z-index: -1;
+  z-index: 1;
 `
 
 const MyBox = styled.div`
   writing-mode: vertical-rl;
   text-orientation: upright;
-  div {
-  writing-mode: none;
-  text-orientation: none;
-  }
+  z-index: 2;
   display: inline-block;
   position: absolute;    
   padding-top: 10px;
@@ -391,6 +453,16 @@ const MyBox = styled.div`
 const Nav = styled.div`
 `
 
-const itemInBox = styled.li`
-  list-style-type: none;
+const Del = styled.span`
+width: 13px;
+height: 13px;
+font-size: 13px;
+text-align: center;
+display: inline-block;
+border: 1px solid red;
+color: red;
+`
+
+const ItemInBox = styled.input`
+
 `
