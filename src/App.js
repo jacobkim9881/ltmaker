@@ -202,19 +202,21 @@ class App extends Component {
   }
 
   checkInBox(e) {
-    let id = e.target.id;
-    let itemBox = this.state.itemBox;    
-    let cut = itemBox.splice(id, 1);    
-    let nums = this.state.nums.concat(cut);
-    let tiersInItemBox = this.state.tiersInItemBox;
-    let cutTier = tiersInItemBox.splice(id, 1);
-    let tierBox = this.state.tierBox.concat(cutTier);
-    this.setState({
-      nums: nums,
-      itemBox: itemBox,
-      tierBox: tierBox,
-      tiersInItemBox: tiersInItemBox
-    })
+    if (this.state.nums.length < 5) {
+      let id = e.target.id;
+      let itemBox = this.state.itemBox;    
+      let cut = itemBox.splice(id, 1);    
+      let nums = this.state.nums.concat(cut);
+      let tiersInItemBox = this.state.tiersInItemBox;
+      let cutTier = tiersInItemBox.splice(id, 1);
+      let tierBox = this.state.tierBox.concat(cutTier);
+      this.setState({
+        nums: nums,
+        itemBox: itemBox,
+        tierBox: tierBox,
+        tiersInItemBox: tiersInItemBox
+      })
+    }
   } 
 
   deleteItem(e) {
@@ -260,7 +262,9 @@ class App extends Component {
       <Contain>
          {this.state.nums.map((arr, index) =>
          <div>
+           <span style={{userSelect: "none;"}}>
            {this.state.tierBox[index]}
+           </span>
           <Balls id={index} onClick={this.markNum}>
           {arr.map((eye, index) => <span>
           {index !== 0 && (index + 1)%7 === 0 ?
@@ -284,24 +288,30 @@ class App extends Component {
       {this.state.menuOn ?
       <Nav> 
       <MyBox onClick={this.menuTurn} On> 
-      Numbers
+      번호함
       </MyBox> 
       <Items>
         <ul>
           {this.state.itemBox.map((arr, index) => 
           <itemInBox>
-            <li style={{listStyleType: "none"}}>
+            <li style={{listStyleType: "none"}}>      
+            <TierNum>
             {this.state.tiersInItemBox[index] + " "}
+            </TierNum>        
+            <td style={{width: "160px"}}>
             {arr+" "}
+            </td>
+            <td style={{width: "50px"}}>
             <ItemInBox id={index} onChange={this.checkInBox} type="checkbox" value="itemInBox" />
             <Del onClick={this.deleteItem}>X</Del>            
+            </td>
             </li>
           </itemInBox>)}
         </ul>
       </Items>
       </Nav>: 
       <MyBox onClick={this.menuTurn} Off> 
-      Numbers
+      번호함
       </MyBox>}
     </div>
   );
@@ -353,11 +363,11 @@ const Contain = styled.div`
     position: absolute;
     display: inline-block;
 }
-  width: 420px;
-  height: 500px;    
+  width: 100%;
+  height: 300px;    
   margin-top: 50px;  
   margin-left: 50px;
-  display: inline-block;
+  display: block;
 `
 const Balls = styled.div`
 display: inline-block;
@@ -416,39 +426,62 @@ const NumCheck = styled.span`
         color: red;
     }
 `
-const Items = styled.div`
-  height: 100%;
-  display: inline-block;
-  position: fixed;
-  right: 0;
-  width: 300px;
-  top: 0px;
-  border-width: 0 0 0 1px;
+
+const TierNum = styled.td`
+  width: 20px;
+  user-select: none;
+`
+
+const Items = styled.div`    
   border-style: solid;
   border-color: hsl(0, 0%, 93%);
   z-index: 1;
+  @media screen and (min-width: 480px) {
+    display: inline-block;    
+    height: 100%;
+    position: fixed;
+    right: 0;
+    width: 300px;
+    top: 0px;
+    border-width: 0 0 0 1px;
+  }
 `
 
 const MyBox = styled.div`
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  z-index: 2;
-  display: inline-block;
-  position: absolute;    
-  padding-top: 10px;
-  padding-right: 10px;
-  width: 30px;
-  height: 120px;
   border-width: 1px 1px 1px 1px;
+  z-index: 2;
+  display: inline-block;  
   border-style: solid;
   border-color: hsl(0, 0%, 93%) hsl(0, 0%, 100%) hsl(0, 0%, 93%) hsl(0, 0%, 93%);
+  background-color: white;
+  cursor: pointer;
+
+@media screen and (min-width: 480px) {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  padding-top: 10px;
+  padding-right: 10px;
+  position: absolute;    
+  width: 30px;
+  height: 120px;  
   top: 50%;
   ${props => props.Off ? 
-  "right: 0px;" : 
-  props.On ?
-  "right: 300px;" :
-  "right: 0px;"
-  }  
+    "right: 0px;" : 
+    props.On ?
+    "right: 300px;" :
+    "right: 0px;"
+    }  
+}
+  position: sticky;
+  text-align: center;  
+  width: 100%;
+  height: 30px;  
+    ${props => props.Off ? 
+    "bottom: 0px;" : 
+    props.On ?
+    "bottom: 300px;" :
+    "bottom: 0px;"
+    }  
 `
 const Nav = styled.div`
 `
@@ -456,11 +489,14 @@ const Nav = styled.div`
 const Del = styled.span`
 width: 13px;
 height: 13px;
+margin-left: 10px;
 font-size: 13px;
 text-align: center;
 display: inline-block;
 border: 1px solid red;
 color: red;
+cursor: pointer;
+user-select: none;
 `
 
 const ItemInBox = styled.input`
