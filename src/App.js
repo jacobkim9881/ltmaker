@@ -5,6 +5,8 @@ import Ball from './component/ball'
 import Tag from './component/nameTag'
 import MixButton from './component/mixBtn'
 import CheckBox from './component/checkBx'
+
+
 import * as d3 from 'd3'
 const history = require('./history.csv')
 //import Refresh from './component/Refresh'
@@ -71,14 +73,15 @@ class App extends Component {
   }
 
   handleRefresh() {    
-    let clicked = this.state.paper.filter(num => typeof num === "string")    
+    let paper = this.state.paper
+    let clicked = paper.filter(num => typeof num === "string");    
     if (this.state.nums.length < 5) {
       if (clicked.length !== 0) {
         let arr = [];            
         let tier = [];
         for (let i = 0; i < 7; i++) {
           let cut = Math.trunc((Math.random() * 45)+ 1);                  
-          let findS = arr.find(num => num === cut);    
+          let findS = arr.find(num => parseInt(num, 10) === cut);    
           if (typeof clicked[i] !== "undefined") {
             arr.push(clicked[i]);
           } else if(typeof findS === 'undefined') {
@@ -235,7 +238,7 @@ class App extends Component {
   return (
     <div>
     <Main>            
-      <Paper>
+      <Paper>        
       <Tag />
       {this.state.paper.map((mark, index) =>
         mark[mark.length - 1] === " " ? 
@@ -293,7 +296,7 @@ class App extends Component {
       <Items>
         <ul>
           {this.state.itemBox.map((arr, index) => 
-          <itemInBox>
+          <div>
             <li style={{listStyleType: "none"}}>      
             <TierNum>
             {this.state.tiersInItemBox[index] + " "}
@@ -303,10 +306,10 @@ class App extends Component {
             </td>
             <td style={{width: "50px"}}>
             <ItemInBox id={index} onChange={this.checkInBox} type="checkbox" value="itemInBox" />
-            <Del onClick={this.deleteItem}>X</Del>            
+            <Del id={index} onClick={this.deleteItem}>X</Del>            
             </td>
             </li>
-          </itemInBox>)}
+          </div>)}
         </ul>
       </Items>
       </Nav>: 
@@ -457,13 +460,12 @@ const MyBox = styled.div`
   cursor: pointer;
 
 @media screen and (min-width: 480px) {
-  writing-mode: vertical-rl;
   text-orientation: upright;
-  padding-top: 10px;
+  padding-top: 20px;
   padding-right: 10px;
   position: absolute;    
   width: 30px;
-  height: 120px;  
+  height: 80px;  
   top: 50%;
   ${props => props.Off ? 
     "right: 0px;" : 
