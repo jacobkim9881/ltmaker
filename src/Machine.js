@@ -27,12 +27,16 @@ class Machine extends Component {
     this.checkInBox = this.checkInBox.bind(this);
     this.deleteItem = this.deleteItem.bind(this);
     this.ran7 = this.ran7.bind(this);
+    this.changeCheckType = this.changeCheckType.bind(this);
+    this.findCheckType = this.findCheckType.bind(this);
   }
 
   state = {
     nums: [],
     paper: [],
+    checkerType: 'deflt',
     checker: [],
+    rememberCheck: true,
     histories: this.getCsv(),
     menuOn: false,
     itemBox: [],
@@ -48,25 +52,34 @@ class Machine extends Component {
     return arr;
   }
   num45() {
-    let arr = []
-    for (let i = 1; i < 46; i++) {
-      arr.push(i )
+    if (!this.state.rememberCheck) {
+      let arr = []
+      for (let i = 1; i < 46; i++) {
+        arr.push(i )
+      }
+      this.setState({paper: arr});
     }
-    this.setState({paper: arr});
   }
+
   componentDidMount() {    
-    this.num45();
+  let arr = []
+  for (let i = 1; i < 46; i++) {
+    arr.push(i )
+  }
+  this.setState({paper: arr});    
   }
 
   getNum() {    
+    let paper = this.state.paper;
     let yourNum = [];
+    let nums = paper.filter(num => num.toString(10).indexOf("x") === -1);
     for (let j = 0; j < 7; j++) {
-      let cut = Math.trunc((Math.random() * 45)+ 1);                  
-      let findS = yourNum.find(num => num === cut);      
-      if (typeof findS === 'undefined') {
-        yourNum.push(cut);                  
-      } else {
-        j--
+      let cut = nums[Math.trunc(Math.random() * nums.length)].toString().match(/\d+/)[0];                  
+      let findS = yourNum.find(num => num === cut);                  
+      if (typeof findS === 'undefined') {        
+        yourNum.push(cut);               
+     } else {
+        j--;
       }      
     }    
     return yourNum;
@@ -74,18 +87,19 @@ class Machine extends Component {
 
   handleRefresh() {    
     let paper = this.state.paper
-    let clicked = paper.filter(num => typeof num === "string");    
+    let clicked = paper.filter(num => num.toString(10).indexOf(" ") !== -1);    
+    let nums = paper.filter(num => num.toString(10).indexOf("x") === -1);
     if (this.state.nums.length < 5) {
       if (clicked.length !== 0) {
         let arr = [];            
         let tier = [];
         for (let i = 0; i < 7; i++) {
-          let cut = Math.trunc((Math.random() * 45)+ 1);                  
-          let findS = arr.find(num => parseInt(num, 10) === cut);    
+          let cut = nums[Math.trunc(Math.random() * nums.length)].toString().match(/\d+/)[0];                  
+          let findS = arr.find(num => parseInt(num, 10) === cut);                                            
           if (typeof clicked[i] !== "undefined") {
             arr.push(clicked[i]);
-          } else if(typeof findS === 'undefined') {
-            arr.push(cut);
+          } else if(typeof findS === 'undefined') {                        
+            arr.push(cut);            
           } else {
             i--
           }
@@ -105,7 +119,8 @@ class Machine extends Component {
         this.setState({
           nums: pushingRan,
           tierBox: pushingTier          
-        })        
+        });
+        this.num45();                
     }
     }
     //store.dispatch({type: GETNUM})
@@ -170,18 +185,36 @@ class Machine extends Component {
     } else {};
   }
 
+  findCheckType(arr, num, type) {
+    let idx = arr[num - 1].toString(10).indexOf(type)      
+      if (idx === -1) {
+        arr.splice(num - 1, 1, num + type);      
+        this.setState({paper: arr});      
+      } else {
+        arr.splice(num - 1, 1, arr[num - 1].toString(10).replace(type, ''))
+        this.setState({paper: arr});      
+      }      
+  }
+
   checkNum(e) {        
+    console.log(this.state.paper)
     e.preventDefault();
     let num = parseInt(e.currentTarget.id, 10);    
     let arr = this.state.paper;
-    let targetNum = arr[num - 1];          
-    if(typeof targetNum !== "string") {
-      arr.splice(num - 1, 1, num + " ");      
-      this.setState({paper: arr});      
-    } else {
-      arr.splice(num - 1, 1, num);      
-      this.setState({paper: arr});    
+    if (this.state.checkerType === 'deflt') {
+      this.findCheckType(arr, num, ' ')
+    } else if (this.state.checkerType === 'pencil') {      
+      this.findCheckType(arr, num, 'c')
+    } else if (this.state.checkerType === 'without') {
+      this.findCheckType(arr, num, 'x')
     }
+    //if(typeof targetNum.match(/\s/) !== "null") {
+    //  arr.splice(num - 1, 1, num + " ");      
+    //  this.setState({paper: arr});      
+    //} else {
+    //  arr.splice(num - 1, 1, num);      
+    //  this.setState({paper: arr});    
+    //}
   }
   
   menuTurn() {
@@ -234,6 +267,34 @@ class Machine extends Component {
     });
   }
 
+  changeCheckType(e) {
+    this.setState({checkerType: e.target.id}) 
+  }
+
+  putNums(mark, type) {      
+    switch(type) {
+      case " ":
+      return <Num checked onClick={this.checkNum} id={mark}>
+      {mark.toString().match(/\d+/)[0]}
+      </Num>;
+      case "c":
+      return <Num pencil onClick={this.checkNum} id={mark}>
+      {mark.toString().match(/\d+/)[0]}
+      </Num>;
+      case "x":
+      return <Num onClick={this.checkNum} id={mark}>
+      <span style={{
+        textDecoration: "line-through",
+        textDecorationColor: "black"
+    }}>{mark.toString().match(/\d+/)[0]}</span>
+      </Num>;   
+      default :
+      return <Num onClick={this.checkNum} id={mark}>
+      {mark.toString().match(/\d+/)[0]}
+      </Num>   
+    }
+  }
+
   render() {    
   return (
     <div>
@@ -241,20 +302,24 @@ class Machine extends Component {
       <Paper>        
       <Tag />
       {this.state.paper.map((mark, index) =>
-        mark[mark.length - 1] === " " ? 
-        <NumCheck onClick={this.checkNum} id={mark}>
-          {mark > 9 ?
-          mark :
-          <span style={{padding: "0px 5.5px"}}>{mark}</span>}
-        </NumCheck> :
-        <Num onClick={this.checkNum} id={mark}>
-        {mark > 9 ?
-          mark :
-          <span style={{padding: "0px 5.5px"}}>{mark}</span>}        
-        </Num>
+        mark.toString().indexOf(" ") !== -1 ? 
+        this.putNums(mark, " ") : mark.toString().indexOf("c") !== -1 ? 
+        this.putNums(mark, "c") : mark.toString().indexOf("x") !== -1 ? 
+        this.putNums(mark, "x") :
+        this.putNums(mark)        
       )}
       <Button onClick={this.handleRefresh} >당첨번호 얻기</Button>
       </Paper>
+      <Pencils>        
+        <input type="radio" id="deflt" name="checker" onChange={this.changeCheckType} /> 컴퓨터용 사인펜 <br />
+        <input type="radio" id="pencil" name="checker" onChange={this.changeCheckType} /> 연필 <br />
+        <input type="radio" id="without" name="checker" onChange={this.changeCheckType} /> 제외 수 추가<br />        
+        <input type="checkbox" 
+        name="rememberCheck" 
+        defaultChecked={true}
+        onChange={() => this.setState({rememberCheck: !this.state.rememberCheck})} />
+         체크한 번호 고정하기
+      </Pencils>
       {      
       //<form onSubmit={this.getNumsByHand}>
       //<input type="text" name="putNums" ref={ref => {this.nums = ref}} />
@@ -278,7 +343,7 @@ class Machine extends Component {
         }        
         </span>)}
         </Balls> 
-        <input type="checkbox" id={index} onChange={this.checkOn}/>
+        <input type="checkbox" name={index} id={index} onChange={this.checkOn}/>
         {index === 4 ? 
         <Mix type="submit" onClick={this.ran7} name="mix" value="이 중에서 랜덤 7개 뽑기" />
          : ""}
@@ -396,11 +461,15 @@ const Mix = styled.input`
 `
 
 const Num = styled.span`
+    width: 21px;
     display: inline-block;    
     font-size: 1.2rem;
+    text-align: center;
     text-decoration: none;
     padding: 0.5rem 0.25rem 0.5rem 0.25rem;
-    color: red;
+    color: ${props => props.checked ? "hsl(0, 100%, 100%);" : props.pencil ? "black;" : "red;"}
+    background-color: ${props => props.checked ? "hsl(0, 100%, 0%);" :
+    props.pencil ? "grey;" : ";"}
     border-top-style: solid;
     border-bottom-style: solid;
     border-width: 2px 0px 2px 0px;
@@ -408,13 +477,16 @@ const Num = styled.span`
     cursor: pointer;    
 
     &:hover {
-        background-color: hsl(60, 100%, 50%);
+        background-color: ${props => props.checked ? "hsl(0, 100%, 100%);" : "hsl(60, 100%, 50%);"} 
+        color: ${props => props.checked ? "red;" : ";"}
     }
 `
 
 const NumCheck = styled.span`
+    width: 21px;
     display: inline-block;    
     font-size: 1.2rem;
+    text-align: center;
     text-decoration: none;
     padding: 0.5rem 0.25rem 0.5rem 0.25rem;
     color: hsl(0, 100%, 100%);
@@ -502,5 +574,9 @@ user-select: none;
 `
 
 const ItemInBox = styled.input`
+
+`
+
+const Pencils = styled.form`
 
 `

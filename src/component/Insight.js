@@ -14,28 +14,20 @@ class Insight extends Component {
         this.showChained = this.showChained.bind(this);
         this.deleteBlanks = this.deleteBlanks.bind(this);
         this.mappingNums = this.mappingNums.bind(this);
+        this.filterCount = this.filterCount.bind(this);
+        this.diffArray = this.diffArray.bind(this);
     }
 
     state = {
         clicked: true,
         clickedNum: [],
-        arg: 'same',
-        filtering: false
+        arg: 'ten',
+        filtering: 'default',
+        rounds: []
     }
 
     mappingNums() {
-        db.map(data => <Nums >
-            <Round 
-             fClr={data.round} max={db.length}>{data.round}</Round> : 
-            {this.switchFunc(data.fst)
-        },                     
-            {this.switchFunc(data.snd)}, 
-            {this.switchFunc(data.trd)}, 
-            {this.switchFunc(data.foth)}, 
-            {this.switchFunc(data.fvth)}, 
-            {this.switchFunc(data.sth)} + 
-            {this.switchFunc(data.bonus)}                    
-            </Nums>);                    
+        return <div>ddd</div>
     }
 
     chooseArg(e) {
@@ -80,7 +72,6 @@ class Insight extends Component {
     showChained(e) {
         let arr = this.state.clickedNum
         let inx = this.state.clickedNum.indexOf(parseInt(e.target.id, 10));         
-        console.log(inx)
         if (inx !== -1) {
             arr.splice(inx, 1);
             this.setState({ clickedNum: arr});
@@ -88,6 +79,16 @@ class Insight extends Component {
             arr.push(parseInt(e.target.id));            
             this.setState({ clickedNum: arr });
         }           
+    }
+
+    findNumMtd(arg, data) {
+        let arr = this.state.clickedNum;
+        switch(arg) {
+            case 'same' :
+            return arg.indexOf(parseInt(data, 10));
+            case 'right' :
+            return arg.indexOf(this.getRightOne(data));
+        }
     }
 
     switchFunc(data) {
@@ -107,61 +108,113 @@ class Insight extends Component {
             this.state.clickedNum.indexOf(parseInt(data, 10) + 1) !== -1 ?
             <Num onClick={this.showChained} id={data}>{data}</Num> :
             <HideNum onClick={this.showChained} id={data}>{data}</HideNum> ;
+            case 'ten':
+            return parseInt(data, 10) <= 10 ?
+            <Sector4Num tens id={data}>{data}</Sector4Num> : 
+            parseInt(data, 10) <= 20 ?
+            <Sector4Num twenties id={data}>{data}</Sector4Num> : 
+            parseInt(data, 10) <= 30 ?
+            <Sector4Num thirties id={data}>{data}</Sector4Num> : 
+            parseInt(data, 10) <= 40 ?
+            <Sector4Num forties id={data}>{data}</Sector4Num> :
+            <Sector4Num rest id={data}>{data}</Sector4Num>
         }
     }
 
     deleteBlanks() {
-        let arr = this.state.clickedNum;
-        if (this.state.clickedNum.length > 0) {
-            return db.map(data => 
-            (arr.indexOf(parseInt(data.fst)) !== - 1 ||
-            arr.indexOf(parseInt(data.snd)) !== - 1 ||
-            arr.indexOf(parseInt(data.trd)) !== - 1 ||
-            arr.indexOf(parseInt(data.fort)) !== - 1 ||
-            arr.indexOf(parseInt(data.fvth)) !== - 1 ||
-            arr.indexOf(parseInt(data.sth)) !== - 1 ||
-            arr.indexOf(parseInt(data.bonus)) !== - 1
-            ) ?
-                 <Nums >
-                    <Round 
-                     fClr={data.round} max={db.length}>{data.round}</Round> : 
-                    {this.switchFunc(data.fst)
-                },                     
-                    {this.switchFunc(data.snd)}, 
-                    {this.switchFunc(data.trd)}, 
-                    {this.switchFunc(data.foth)}, 
-                    {this.switchFunc(data.fvth)}, 
-                    {this.switchFunc(data.sth)} + 
-                    {this.switchFunc(data.bonus)}                    
-                    </Nums> : ''            
-            )
+    }
+
+    filterCount(arg) {
+        switch(arg) {
+            case 'default':
+            return db.map(data => <Nums >
+                <Round 
+                 fClr={data.round} max={db.length}>{data.round}</Round> : 
+                {this.switchFunc(data.fst)
+            },                     
+                {this.switchFunc(data.snd)}, 
+                {this.switchFunc(data.trd)}, 
+                {this.switchFunc(data.foth)}, 
+                {this.switchFunc(data.fvth)}, 
+                {this.switchFunc(data.sth)} + 
+                {this.switchFunc(data.bonus)}                
+                </Nums>);
         }
     }
+
+    diffArray(arr1, arr2) {
+        var newArr = [];
+        newArr = arr1.slice(0, arr1.length);  
+        let otherArr = [];
+        otherArr = arr2.slice(0, arr2.length);
+        
+        for (let i = newArr.length - 1; i >= 0; i--) {
+          let index = otherArr.indexOf(newArr[i]);
+          if (index != -1) {
+            newArr.splice(i, 1);
+            otherArr.splice(index, 1);
+          }
+          
+        }
+
+        let newLength = otherArr.concat(newArr).length;
+        let length = arr1.concat(arr2).length;
+
+        if(newLength === length) {
+            return 1;
+        } else {
+            return -1;
+        }
+      }
 
     render() {
         return (
             <div>
+                {this.state.test}
                 {//<input type='checkbox' onChange={() => this.setState({filtering : !this.state.filtering})} /> 번호 중복 <br />
                 }
                 <form>
-                    <input type='radio' id='same' onClick={this.chooseArg} /> 같은 수 : 숫자를 클릭하면 같은 숫자들을 강조합니다. <br />
-                    <input type='radio' id='right' onClick={this.chooseArg} /> 끝수 : 숫자를 클릭하면 끝자리가 같은 숫자들을 강조합니다.<br />
-                    <input type='radio' id='chain' onClick={this.chooseArg} /> 연번 : 숫자를 클릭하면 해당 숫자의 +-1 에 해당하는 숫자들을 강조합니다.<br />
+                    <input type='radio' defaultChecked={true} name="typeArg" id='ten' onClick={this.chooseArg} /> 10번대로 끊기 : 숫자들을 10번대로 색을 칠해 구분합니다.<br />                    
+                    <input type='radio' name="typeArg" id='same' onClick={this.chooseArg} /> 같은 수 : 숫자를 클릭하면 같은 숫자들을 강조합니다. <br />
+                    <input type='radio' name="typeArg" id='right' onClick={this.chooseArg} /> 끝수 : 숫자를 클릭하면 끝자리가 같은 숫자들을 강조합니다.<br />
+                    <input type='radio' name="typeArg" id='chain' onClick={this.chooseArg} /> 연번 : 숫자를 클릭하면 해당 숫자의 +-1 에 해당하는 숫자들을 강조합니다.<br />                                        
                 </form>
+                    <input type='checkbox' onChange={() => this.setState({filtering : 'write'})} /> 선택번호 남기기 <br />                    
                 <ul>
-                    {db.map(data => <Nums >
-            <Round 
-             fClr={data.round} max={db.length}>{data.round}</Round> : 
-            {this.switchFunc(data.fst)
-        },                     
-            {this.switchFunc(data.snd)}, 
-            {this.switchFunc(data.trd)}, 
-            {this.switchFunc(data.foth)}, 
-            {this.switchFunc(data.fvth)}, 
-            {this.switchFunc(data.sth)} + 
-            {this.switchFunc(data.bonus)}                    
-            </Nums>)
-                }
+                    {
+            //        this.state.filtering === true ?
+            //        db.map(data => 
+            //        this.diffArray(this.state.clickedNum, [
+            //            data.fst, data.snd, data.trd, data,foth, data.fvth, data.sth, data.bonus
+            //        ]) === 1 ?
+            //        "" :
+            //        <Nums >
+            //            <Round 
+            //             fClr={data.round} max={db.length}>{data.round}</Round> : 
+            //            {this.switchFunc(data.fst)
+            //        },                     
+            //            {this.switchFunc(data.snd)}, 
+            //            {this.switchFunc(data.trd)}, 
+            //            {this.switchFunc(data.foth)}, 
+            //            {this.switchFunc(data.fvth)}, 
+            //            {this.switchFunc(data.sth)} + 
+            //            {this.switchFunc(data.bonus)}                
+            //            </Nums> )
+            //             :
+            //         db.map(data => <Nums >
+            //            <Round 
+            //             fClr={data.round} max={db.length}>{data.round}</Round> : 
+            //            {this.switchFunc(data.fst)
+            //        },                     
+            //            {this.switchFunc(data.snd)}, 
+            //            {this.switchFunc(data.trd)}, 
+            //            {this.switchFunc(data.foth)}, 
+            //            {this.switchFunc(data.fvth)}, 
+            //            {this.switchFunc(data.sth)} + 
+            //            {this.switchFunc(data.bonus)}                
+            //            </Nums>)
+                  }
+            {this.filterCount(this.state.filtering)}
                 </ul>
             </div>
         );
@@ -199,6 +252,22 @@ const HideNum = styled.span`
     width: 30px;
     height: 28px;
     text-align: center;
+    font-size: 25px;
+    cursor: pointer;
+    margin: 5px;
+`
+
+const Sector4Num = styled.span`
+    display: inline-block;
+    width: 30px;
+    height: 28px;
+    text-align: center;
+    background-color: ${props => props.tens ? "hsl(0, 100%, 80%);" :
+        props.twenties ? "hsl(20, 100%, 80%);" :
+        props.thirties ? "hsl(60, 100%, 80%);" :
+        props.forties ? "hsl(120, 100%, 80%);" :
+        props.rest ?"hsl(280, 100%, 80%);" : ""
+}
     font-size: 25px;
     cursor: pointer;
     margin: 5px;

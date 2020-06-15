@@ -931,6 +931,6 @@ let arr = text.match(/[^\n]+/g)
 //    }    
 //}
 
-const fs = require('fs');
+//const fs = require('fs');
 
 //fs.writeFile('text.js', cont, 'utf8', console.log('hello'))
