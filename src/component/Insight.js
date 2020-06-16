@@ -16,6 +16,7 @@ class Insight extends Component {
         this.mappingNums = this.mappingNums.bind(this);
         this.filterCount = this.filterCount.bind(this);
         this.diffArray = this.diffArray.bind(this);
+        this.tempRounds = this.tempRounds.bind(this);
     }
 
     state = {
@@ -23,7 +24,7 @@ class Insight extends Component {
         clickedNum: [],
         arg: 'ten',
         filtering: 'default',
-        rounds: []
+        round: 0
     }
 
     mappingNums() {
@@ -91,7 +92,7 @@ class Insight extends Component {
         }
     }
 
-    switchFunc(data) {
+    switchFunc(data, round) {
         let arg = this.state.arg;
         switch(arg) {
             case 'same' :
@@ -108,14 +109,19 @@ class Insight extends Component {
             this.state.clickedNum.indexOf(parseInt(data, 10) + 1) !== -1 ?
             <Num onClick={this.showChained} id={data}>{data}</Num> :
             <HideNum onClick={this.showChained} id={data}>{data}</HideNum> ;
+            case 'write' :
+            return  this.tempRounds(data, round) ? 
+            <Num onClick={this.showChained} id={data}>{data}</Num> :
+            <HideNum onClick={this.showChained} id={data}>{data}</HideNum> 
+            ;            
             case 'ten':
-            return parseInt(data, 10) <= 10 ?
+            return parseInt(data, 10) < 10 ?
             <Sector4Num tens id={data}>{data}</Sector4Num> : 
-            parseInt(data, 10) <= 20 ?
+            parseInt(data, 10) < 20 ?
             <Sector4Num twenties id={data}>{data}</Sector4Num> : 
-            parseInt(data, 10) <= 30 ?
+            parseInt(data, 10) < 30 ?
             <Sector4Num thirties id={data}>{data}</Sector4Num> : 
-            parseInt(data, 10) <= 40 ?
+            parseInt(data, 10) < 40 ?
             <Sector4Num forties id={data}>{data}</Sector4Num> :
             <Sector4Num rest id={data}>{data}</Sector4Num>
         }
@@ -124,9 +130,57 @@ class Insight extends Component {
     deleteBlanks() {
     }
 
-    filterCount(arg) {
+    tempRounds(data, round) {
+        let arr = [];
+        let nRound = db.length
+        let formerRound = round - 1;
+        let laterRound = round + 1;
+        if (typeof db[nRound % formerRound] !== 'undefined') {
+            arr.push(parseInt(db[nRound % formerRound].fst, 10));    
+            arr.push(parseInt(db[nRound % formerRound].snd, 10));    
+            arr.push(parseInt(db[nRound % formerRound].trd, 10));    
+            arr.push(parseInt(db[nRound % formerRound].foth, 10));    
+            arr.push(parseInt(db[nRound % formerRound].fvth, 10));    
+            arr.push(parseInt(db[nRound % formerRound].sth, 10));    
+            arr.push(parseInt(db[nRound % formerRound].bonus, 10));    
+        }
+        if (typeof db[nRound % laterRound] !== 'undefined') {
+            arr.push(parseInt(db[nRound % laterRound].fst, 10));    
+            arr.push(parseInt(db[nRound % laterRound].snd, 10));    
+            arr.push(parseInt(db[nRound % laterRound].trd, 10));    
+            arr.push(parseInt(db[nRound % laterRound].foth, 10));    
+            arr.push(parseInt(db[nRound % laterRound].fvth, 10));    
+            arr.push(parseInt(db[nRound % laterRound].sth, 10));    
+            arr.push(parseInt(db[nRound % laterRound].bonus, 10));    
+        }
+        if (round == '915') {
+            console.log(db.length + " " + db[nRound % formerRound].fst + " " + round + " " + data + " " + arr)
+        }
+        
+
+        if (arr.indexOf(parseInt(data, 10)) !== - 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    filterCount(arg) {        
         switch(arg) {
             case 'default':
+            return db.map(data => <Nums >
+                <Round 
+                 fClr={data.round} max={db.length}>{data.round}</Round> : 
+                {this.switchFunc(data.fst, parseInt(data.round, 10))
+            },                     
+                {this.switchFunc(data.snd, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.trd, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.foth, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.fvth, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.sth, parseInt(data.round, 10))} + 
+                {this.switchFunc(data.bonus, parseInt(data.round, 10))}
+                </Nums>);          
+            case 'write':
             return db.map(data => <Nums >
                 <Round 
                  fClr={data.round} max={db.length}>{data.round}</Round> : 
@@ -138,8 +192,9 @@ class Insight extends Component {
                 {this.switchFunc(data.fvth)}, 
                 {this.switchFunc(data.sth)} + 
                 {this.switchFunc(data.bonus)}                
-                </Nums>);
-        }
+                </Nums>)
+          }
+        
     }
 
     diffArray(arr1, arr2) {
@@ -167,10 +222,10 @@ class Insight extends Component {
         }
       }
 
-    render() {
+    render() {                           
         return (
-            <div>
-                {this.state.test}
+            <div>                
+                {this.state.test}                
                 {//<input type='checkbox' onChange={() => this.setState({filtering : !this.state.filtering})} /> 번호 중복 <br />
                 }
                 <form>
@@ -178,42 +233,9 @@ class Insight extends Component {
                     <input type='radio' name="typeArg" id='same' onClick={this.chooseArg} /> 같은 수 : 숫자를 클릭하면 같은 숫자들을 강조합니다. <br />
                     <input type='radio' name="typeArg" id='right' onClick={this.chooseArg} /> 끝수 : 숫자를 클릭하면 끝자리가 같은 숫자들을 강조합니다.<br />
                     <input type='radio' name="typeArg" id='chain' onClick={this.chooseArg} /> 연번 : 숫자를 클릭하면 해당 숫자의 +-1 에 해당하는 숫자들을 강조합니다.<br />                                        
-                </form>
-                    <input type='checkbox' onChange={() => this.setState({filtering : 'write'})} /> 선택번호 남기기 <br />                    
+                    <input type='radio' name="typeArg" id='write' onClick={this.chooseArg} /> 이월수 : 각 회차의 +-1 에 해당하는 회차에서 겹치는 숫자들을 강조합니다.<br />                                        
+                </form>                    
                 <ul>
-                    {
-            //        this.state.filtering === true ?
-            //        db.map(data => 
-            //        this.diffArray(this.state.clickedNum, [
-            //            data.fst, data.snd, data.trd, data,foth, data.fvth, data.sth, data.bonus
-            //        ]) === 1 ?
-            //        "" :
-            //        <Nums >
-            //            <Round 
-            //             fClr={data.round} max={db.length}>{data.round}</Round> : 
-            //            {this.switchFunc(data.fst)
-            //        },                     
-            //            {this.switchFunc(data.snd)}, 
-            //            {this.switchFunc(data.trd)}, 
-            //            {this.switchFunc(data.foth)}, 
-            //            {this.switchFunc(data.fvth)}, 
-            //            {this.switchFunc(data.sth)} + 
-            //            {this.switchFunc(data.bonus)}                
-            //            </Nums> )
-            //             :
-            //         db.map(data => <Nums >
-            //            <Round 
-            //             fClr={data.round} max={db.length}>{data.round}</Round> : 
-            //            {this.switchFunc(data.fst)
-            //        },                     
-            //            {this.switchFunc(data.snd)}, 
-            //            {this.switchFunc(data.trd)}, 
-            //            {this.switchFunc(data.foth)}, 
-            //            {this.switchFunc(data.fvth)}, 
-            //            {this.switchFunc(data.sth)} + 
-            //            {this.switchFunc(data.bonus)}                
-            //            </Nums>)
-                  }
             {this.filterCount(this.state.filtering)}
                 </ul>
             </div>
