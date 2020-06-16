@@ -6,9 +6,8 @@ import Tag from './component/nameTag'
 import MixButton from './component/mixBtn'
 import CheckBox from './component/checkBx'
 
+import Insight from './component/Insight'
 
-import * as d3 from 'd3'
-const history = require('./history.csv')
 //import Refresh from './component/Refresh'
 //import Num from './component/paper'
 
@@ -45,11 +44,6 @@ class Machine extends Component {
 }
 
   getCsv() {
-    let arr = [];
-    d3.csv(history, (data) => {
-      arr.push(Object.values(data))      
-    });
-    return arr;
   }
   num45() {
     if (!this.state.rememberCheck) {
