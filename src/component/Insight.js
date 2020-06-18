@@ -124,6 +124,10 @@ class Insight extends Component {
             parseInt(data, 10) < 40 ?
             <Sector4Num forties id={data}>{data}</Sector4Num> :
             <Sector4Num rest id={data}>{data}</Sector4Num>
+            case 'doubleNum':
+            return data[0] === data[1] ?
+            <Num onClick={this.showChained} id={data}>{data}</Num> :             
+            <HideNum onClick={this.showChained} id={data}>{data}</HideNum> 
         }
     }
 
@@ -192,7 +196,7 @@ class Insight extends Component {
                 {this.switchFunc(data.fvth)}, 
                 {this.switchFunc(data.sth)} + 
                 {this.switchFunc(data.bonus)}                
-                </Nums>)
+                </Nums>);
           }
         
     }
@@ -228,22 +232,42 @@ class Insight extends Component {
                 {this.state.test}                
                 {//<input type='checkbox' onChange={() => this.setState({filtering : !this.state.filtering})} /> 번호 중복 <br />
                 }
-                <form>
+                <Consoles>
                     <input type='radio' defaultChecked={true} name="typeArg" id='ten' onClick={this.chooseArg} /> 10번대로 끊기 : 숫자들을 10번대로 색을 칠해 구분합니다.<br />                    
                     <input type='radio' name="typeArg" id='same' onClick={this.chooseArg} /> 같은 수 : 숫자를 클릭하면 같은 숫자들을 강조합니다. <br />
                     <input type='radio' name="typeArg" id='right' onClick={this.chooseArg} /> 끝수 : 숫자를 클릭하면 끝자리가 같은 숫자들을 강조합니다.<br />
+                    <input type='radio' name="typeArg" id='doubleNum' onClick={this.chooseArg} /> 쌍수 : 각 자리의 수가 같은 숫자들을 강조합니다.<br />                                        
                     <input type='radio' name="typeArg" id='chain' onClick={this.chooseArg} /> 연번 : 숫자를 클릭하면 해당 숫자의 +-1 에 해당하는 숫자들을 강조합니다.<br />                                        
                     <input type='radio' name="typeArg" id='write' onClick={this.chooseArg} /> 이월수 : 각 회차의 +-1 에 해당하는 회차에서 겹치는 숫자들을 강조합니다.<br />                                        
-                </form>                    
-                <ul>
+                    
+                </Consoles>                    
+                <Rounds>
             {this.filterCount(this.state.filtering)}
-                </ul>
+                </Rounds>
             </div>
         );
     }
 }
 
 export default Insight;
+
+const Consoles = styled.form`
+    display: block;
+    width: 100%;
+    position: absolute;
+    left: 10%;
+    top: 20%;
+`
+
+const Rounds = styled.ul`
+@media screen and (min-width: 480px) {
+    left: 10%;
+}
+    display: block;
+    width: 100%;
+    position: absolute;    
+    top: 45%;    
+`
 
 const Nums = styled.li`
     list-style-type: none;

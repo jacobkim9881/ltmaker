@@ -89,11 +89,14 @@ class Machine extends Component {
         let tier = [];
         for (let i = 0; i < 7; i++) {
           let cut = nums[Math.trunc(Math.random() * nums.length)].toString().match(/\d+/)[0];                  
-          let findS = arr.find(num => parseInt(num, 10) === cut);                                            
+          let findS = arr.find(num => parseInt(num, 10) === parseInt(cut, 10));                                            
           if (typeof clicked[i] !== "undefined") {
-            arr.push(clicked[i]);
+            arr.push(parseInt(clicked[i], 10));
           } else if(typeof findS === 'undefined') {                        
-            arr.push(cut);            
+            console.log("arr" + arr);
+            console.log("findS" + findS);
+            console.log("cut" + cut)
+            arr.push(parseInt(cut, 10));            
           } else {
             i--
           }
@@ -291,6 +294,17 @@ class Machine extends Component {
   return (
     <div>
     <Main>            
+      <Explain>이 페이지는 추첨 번호를 랜덤하게 받거나 원하는 번호와 랜덤한 번호를 섞어 반자동 번호 출력을 시뮬레이션할 수 있는 공간입니다.</Explain>
+      <Pencils>        
+        <input type="radio" id="deflt" name="checker" onChange={this.changeCheckType} /> 컴퓨터용 사인펜 <br />
+        <input type="radio" id="pencil" name="checker" onChange={this.changeCheckType} /> 연필 <br />
+        <input type="radio" id="without" name="checker" onChange={this.changeCheckType} /> 제외 수 추가<br />        
+        <input type="checkbox" 
+        name="rememberCheck" 
+        defaultChecked={true}
+        onChange={() => this.setState({rememberCheck: !this.state.rememberCheck})} />
+         체크한 번호 고정하기
+      </Pencils>
       <Paper>        
       <Tag />
       {this.state.paper.map((mark, index) =>
@@ -302,16 +316,7 @@ class Machine extends Component {
       )}
       <Button onClick={this.handleRefresh} >당첨번호 얻기</Button>
       </Paper>
-      <Pencils>        
-        <input type="radio" id="deflt" name="checker" onChange={this.changeCheckType} /> 컴퓨터용 사인펜 <br />
-        <input type="radio" id="pencil" name="checker" onChange={this.changeCheckType} /> 연필 <br />
-        <input type="radio" id="without" name="checker" onChange={this.changeCheckType} /> 제외 수 추가<br />        
-        <input type="checkbox" 
-        name="rememberCheck" 
-        defaultChecked={true}
-        onChange={() => this.setState({rememberCheck: !this.state.rememberCheck})} />
-         체크한 번호 고정하기
-      </Pencils>
+      
       {      
       //<form onSubmit={this.getNumsByHand}>
       //<input type="text" name="putNums" ref={ref => {this.nums = ref}} />
@@ -389,6 +394,10 @@ const Main = styled.div`
   position: relative;
   width: 400px;
   margin: 0 auto;
+`
+
+const Explain = styled.p`
+  padding-left: 50px;
 `
 
 const Button = styled.button`
@@ -570,5 +579,5 @@ const ItemInBox = styled.input`
 `
 
 const Pencils = styled.form`
-
+    padding-left: 50px;
 `
