@@ -191,8 +191,6 @@ class Machine extends Component {
   }
 
   checkNum(e) {        
-    console.log(this.state.paper)
-    e.preventDefault();
     let num = parseInt(e.currentTarget.id, 10);    
     let arr = this.state.paper;
     if (this.state.checkerType === 'deflt') {
