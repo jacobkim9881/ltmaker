@@ -7,10 +7,13 @@ import db from '../text.json'
 class Insight2 extends Component {
     constructor() {
         super();
+        this.addClicked = this.addClicked.bind(this);
+        this.findNum = this.findNum.bind(this);
     }
 
     state = {
-        nums: []
+        nums: [],
+        colored: []
     }
 
     componentDidMount() {
@@ -21,6 +24,25 @@ class Insight2 extends Component {
         this.setState({nums: nums});
     }
 
+    addClicked(e) {
+        let colored = this.state.colored;
+        let id = e.target.id;
+        let num = parseInt(id.match(/[^n]+/g)[0], 10);
+        let round = parseInt(id.match(/[^n]+/g)[1], 10);
+        colored.push([num, round])
+        this.setState({colored: colored});
+        console.log(this.state.colored)
+    }
+
+    findNum(num, round) {
+        let colored = this.state.colored;
+        for (let i = 0; i < colored.length; i++) {
+            if (colored[i][0] === num && colored[i][1] === round) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     render() {        
@@ -36,8 +58,8 @@ class Insight2 extends Component {
                         parseInt(data.fvth, 10) === num ||
                         parseInt(data.sth, 10) === num ||
                         parseInt(data.bonus, 10) === num ?
-                        <Num onClick={this.showNum} id={num}>{num}</Num> :
-                        <HideNum>{num}</HideNum>
+                        <Num id={num}>{num}</Num> :
+                        <HideNum id={num}>{num}</HideNum>
                         )}
                     </Nums>)}
                 </History>
