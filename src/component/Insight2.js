@@ -1,61 +1,60 @@
 import React, { Component } from 'react';
 import styled from 'styled-components'
 
+import Insight from './Insight'
 import db from '../text.json'
 
-class Insight extends Component {
+class Insight2 extends Component {
     constructor() {
         super();
-        this.showNum = this.showNum.bind(this);
-        this.givingNumber = this.givingNumber.bind(this);
     }
 
     state = {
-        clicked: true,
-        clickedNum: []
+        nums: []
     }
 
-    showNum(e) {        
-        let arr = this.state.clickedNum
-        let inx = this.state.clickedNum.indexOf(parseInt(e.target.id, 10));        
-        console.log(arr)
-        console.log(inx)
-        if (inx !== -1) {
-            arr.splice(inx, 1);
-            console.log(arr)
-            this.setState({ clickedNum: arr})
-            console.log(this.state.clickedNum)
-        } else {
-            this.setState({
-                clicked: !this.state.clicked,
-                clickedNum: this.state.clickedNum.concat(parseInt(e.target.id, 10))
-            })
-        }        
-    }
-
-    givingNumber(data) {
-        return this.state.clickedNum.indexOf(parseInt(data, 10)) !== -1 ?
-        <Num onClick={this.showNum} id={data}>{data}</Num> :
-        <HideNum onClick={this.showNum} id={data}>{data}</HideNum>
+    componentDidMount() {
+        let nums = this.state.nums;
+        for (let i = 0; i < 46; i++) {
+            nums.push(i);
+        }
+        this.setState({nums: nums});
     }
 
 
-    render() {
+
+    render() {        
         return (
             <div>
-                <ul>
-                    {db.map(data => <Nums>d
+                <History>
+                    {db.map(data =>                                         
+                    <Nums>{data.round}: {this.state.nums.map(num => 
+                        parseInt(data.fst, 10) === num ||
+                        parseInt(data.snd, 10) === num ||
+                        parseInt(data.trd, 10) === num ||
+                        parseInt(data.foth, 10) === num ||
+                        parseInt(data.fvth, 10) === num ||
+                        parseInt(data.sth, 10) === num ||
+                        parseInt(data.bonus, 10) === num ?
+                        <Num onClick={this.showNum} id={num}>{num}</Num> :
+                        <HideNum>{num}</HideNum>
+                        )}
                     </Nums>)}
-                </ul>
+                </History>
             </div>
         );
     }
 }
 
-export default Insight;
+export default Insight2;
+
+const History = styled.ul`
+
+`
 
 const Nums = styled.li`
     list-style-type: none;
+    width: 100%;
 `
 
 const Num = styled.span`
@@ -66,7 +65,10 @@ const Num = styled.span`
     background-color: hsl(0, 100%, 80%);
     font-size: 25px;
     cursor: pointer;
-    margin: 5px;
+    margin: 0px;
+    border: 1px solid grey;
+
+    
 `
 
 const HideNum = styled.span`
@@ -77,5 +79,6 @@ const HideNum = styled.span`
     text-align: center;
     font-size: 25px;
     cursor: pointer;
-    margin: 5px;
+    margin: 0px;
+    border: 1px solid grey;
 `

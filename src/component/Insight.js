@@ -32,7 +32,15 @@ class Insight extends Component {
     }
 
     chooseArg(e) {
-        this.setState({arg: e.target.id})
+        if (e.target.id === 'ten') {
+            this.setState({arg: e.target.id,
+            filtering: 'ten'
+            })    
+        } else {
+            this.setState({arg: e.target.id,
+            filtering: 'default'})
+        }
+        
     }
 
     showNum(e) {        

@@ -19,12 +19,13 @@ class App extends Component {
                 </Top>
                 <Nav>
                 <StyledLink to='/'>로또 번호 제조기</StyledLink> {'\t'}
-                <StyledLink to='insight'>로또 번호 분석</StyledLink>
+                <StyledLink to='insight'>로또 번호 분석</StyledLink> {'\t'}
+                <StyledLink to='history'>로또 통계</StyledLink> {'\t'}
                 </Nav>
                 </HeadOne>
                 <div>
                 <Switch>                          
-                    <Route path='/insight2' children={<Insight />} />
+                    <Route path='/history' children={<Insight2 />} />
                     <Route path='/insight' children={<Insight />} />
                     <Route path='/' children={<Machine />} />          
                 </Switch>
