@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import Machine from './Machine'
 import Insight from './component/Insight'
 import Insight2 from './component/Insight2'
+import Graph from './component/Graph'
 
 class App extends Component {
     render() {
@@ -20,11 +21,12 @@ class App extends Component {
                 <Nav>
                 <StyledLink to='/'>로또 번호 제조기</StyledLink> {'\t'}
                 <StyledLink to='insight'>로또 번호 분석</StyledLink> {'\t'}
-                <StyledLink to='history'>로또 통계</StyledLink> {'\t'}
+                <StyledLink to='history'>로또 통계</StyledLink> {'\t'}                
                 </Nav>
                 </HeadOne>
                 <div>
                 <Switch>                          
+                    <Route path='/graph' children={<Graph />} />
                     <Route path='/history' children={<Insight2 />} />
                     <Route path='/insight' children={<Insight />} />
                     <Route path='/' children={<Machine />} />          
