@@ -6,6 +6,7 @@ import Machine from './Machine'
 import Insight from './component/Insight'
 import Insight2 from './component/Insight2'
 import Graph from './component/Graph'
+import LottoQr from './component/LottoQr'
 
 class App extends Component {
     render() {
@@ -22,10 +23,13 @@ class App extends Component {
                 <StyledLink to='/'>로또 번호 제조기</StyledLink> {'\t'}
                 <StyledLink to='insight'>로또 번호 분석</StyledLink> {'\t'}
                 <StyledLink to='history'>로또 통계</StyledLink> {'\t'}                
+                <StyledLink to='graph'>로또 그래프</StyledLink> {'\t'}                
+                <StyledLink to='qrcode'>로또 당첨 확인</StyledLink> {'\t'}        
                 </Nav>
                 </HeadOne>
                 <div>
                 <Switch>                          
+                    <Route path='/qrcode' children={<LottoQr />} />
                     <Route path='/graph' children={<Graph />} />
                     <Route path='/history' children={<Insight2 />} />
                     <Route path='/insight' children={<Insight />} />
@@ -57,7 +61,8 @@ const Logo = styled.span`
 `
 
 const Banner = styled.h2`
-    display: inline-block;
+    display: inline-block;    
+    height: 100%;
     width: 90%;
     text-align: center;
 `

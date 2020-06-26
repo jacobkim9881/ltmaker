@@ -16,6 +16,7 @@ class Machine extends Component {
     super();
     this.num45 = this.num45.bind(this);
     this.getNum = this.getNum.bind(this);
+    this.getOneOfNums = this.getOneOfNums.bind(this);
     this.handleRefresh = this.handleRefresh.bind(this);
     this.getNumsByHand = this.getNumsByHand.bind(this);
     this.markNum = this.markNum.bind(this);
@@ -28,13 +29,19 @@ class Machine extends Component {
     this.ran7 = this.ran7.bind(this);
     this.changeCheckType = this.changeCheckType.bind(this);
     this.findCheckType = this.findCheckType.bind(this);
+    this.addOfNums = this.addOfNums.bind(this);    
+    this.setOfNumsType = this.setOfNumsType.bind(this);
+    this.addChancesOfNums = this.addChancesOfNums.bind(this);
+    this.ofNumsSelector = this.ofNumsSelector.bind(this);
+    this.totalClicked = this.totalClicked.bind(this);
   }
 
   state = {
     nums: [],
     paper: [],
     checkerType: 'deflt',
-    checker: [],
+    curOfNumsType: '',
+    ofNumsType: ['sOne', 1, 'sTwo', 0, 'sThree', 0, 'sFour', 0, 'sFive', 0, 'sSix', 0],
     rememberCheck: true,
     histories: this.getCsv(),
     menuOn: false,
@@ -79,10 +86,47 @@ class Machine extends Component {
     return yourNum;
   }
 
+  getOneOfNums(char, nums) {
+    let paper = this.state.paper;
+    let ofNums = paper.filter(num => num.toString(10).match(char) !== null);
+    let numsArr = [];    
+    if (ofNums.length > 0) {
+      for (let i = 0; i < nums; i++) {        
+        let ran = Math.trunc(Math.random() * ofNums.length);
+        if (typeof ofNums[ran] !== 'undefined' && numsArr.indexOf(ofNums[ran]) !== -1) {
+          i --;
+        } else {
+          numsArr.push(ofNums[ran]);
+          ofNums.splice(ran, 1)          
+        }        
+      }
+      return [numsArr, ofNums];
+    } else {
+      return
+    }
+  }
+
   handleRefresh() {    
     let paper = this.state.paper
     let clicked = paper.filter(num => num.toString(10).indexOf(" ") !== -1);    
     let nums = paper.filter(num => num.toString(10).indexOf("x") === -1);
+    let ofNums = this.state.ofNumsType.filter((data, idx) => typeof data === 'string' && 
+    this.state.ofNumsType[idx + 1] > 0).map(data => 
+      this.getOneOfNums(data, 
+        this.state.ofNumsType[this.state.ofNumsType.indexOf(data) + 1]));    
+    
+    let poped = [];
+
+    for (let i = 0; i < ofNums.length; i++) {
+      clicked = clicked.concat(ofNums[i][0]);
+      poped.push.apply(poped, ofNums[i][0]);
+      poped.push.apply(poped, ofNums[i][1]);
+    }
+
+    for (let i = 0; i < poped.length; i++) {
+      nums.splice(nums.indexOf(poped[i]), 1);
+    }
+
     if (this.state.nums.length < 5) {
       if (clicked.length !== 0) {
         let arr = [];            
@@ -93,9 +137,6 @@ class Machine extends Component {
           if (typeof clicked[i] !== "undefined") {
             arr.push(parseInt(clicked[i], 10));
           } else if(typeof findS === 'undefined') {                        
-            console.log("arr" + arr);
-            console.log("findS" + findS);
-            console.log("cut" + cut)
             arr.push(parseInt(cut, 10));            
           } else {
             i--
@@ -122,6 +163,15 @@ class Machine extends Component {
     }
     //store.dispatch({type: GETNUM})
     //window.location.reload();
+}
+
+totalClicked() {
+  let ofNumsType = this.state.ofNumsType;
+  let paper = this.state.paper
+  let clicked = paper.filter(num => num.toString(10).indexOf(" ") !== -1);
+  let chances = ofNumsType.filter(data => typeof data === 'number');    
+  let totalNums = chances.reduce((a, b) => a + b) + clicked.length;
+  return totalNums;
 }
 
   getNumsByHand(e) {
@@ -202,6 +252,8 @@ class Machine extends Component {
       this.findCheckType(arr, num, 'c')
     } else if (this.state.checkerType === 'without') {
       this.findCheckType(arr, num, 'x')
+    } else if (this.state.checkerType === 'ofNums') {            
+      this.findCheckType(arr, num, this.state.curOfNumsType)
     }
     //if(typeof targetNum.match(/\s/) !== "null") {
     //  arr.splice(num - 1, 1, num + " ");      
@@ -263,7 +315,61 @@ class Machine extends Component {
   }
 
   changeCheckType(e) {
-    this.setState({checkerType: e.target.id}) 
+    this.setState({checkerType: e.target.id})     
+    if (e.target.id === 'ofNums') {
+      this.setState({curOfNumsType: 'sOne'});
+    }
+  }
+
+  setOfNumsType(e) {
+    console.log(e.target.id)
+    this.setState({curOfNumsType: e.target.id});
+  }
+
+  addChancesOfNums(e) {
+    let ofNumsType = this.state.ofNumsType;
+    let index = ofNumsType.indexOf(e.target.id);
+
+    let selected = this.state.paper.filter(data => data.toString().indexOf(e.target.id) !== - 1);
+
+    if (e.target.value === '-') {
+      if (ofNumsType[index + 1] === 0) {
+        
+      } else {
+        ofNumsType.splice(index + 1, 1, ofNumsType[index + 1] - 1)
+        this.setState({ofNumsType: ofNumsType});
+      }      
+    } else if (e.target.value === '+' && this.totalClicked() < 7
+    && ofNumsType[index + 1] < selected.length) {      
+      ofNumsType.splice(index + 1, 1, ofNumsType[index + 1] + 1)
+      this.setState({ofNumsType: ofNumsType});
+    }
+    
+  }
+
+  addOfNums(e) {    
+    let idx = this.state.ofNumsType.indexOf(0);    
+    let ofNumsType = this.state.ofNumsType;
+    let typeName = ofNumsType[idx - 1];
+    if (idx !== -1) {
+      ofNumsType.splice(idx, 1, ofNumsType[idx] + 1);
+    }
+    if (this.totalClicked() < 6) {
+      this.setState({ofNumsType: ofNumsType });        
+    } else {
+      window.alert('나올 숫자가 6개가 되었습니다.' + '\n' + '더 추가하려면 고정수나 선택수를 줄이세요' );
+      return;
+    }       
+  }
+
+  ofNumsSelector(name) {
+    let selected = this.state.paper.filter(data => data.toString().indexOf(name) !== - 1);
+    return <div>
+    <input type="radio" id={name} defaultChecked={false} name="ofNumsType" onClick={this.setOfNumsType}/>
+    구간 선택하기: 번호 ({selected.map(data => data.match(/\d+/)[0]) + " "}) 중 
+<input type='button' id={name} value="-" onClick={this.addChancesOfNums} /> {this.state.ofNumsType[this.state.ofNumsType.indexOf(name) + 1]}개 선택하기
+    <input type='button' id={name} value="+" onClick={this.addChancesOfNums} /><br/>
+    </div>
   }
 
   putNums(mark, type) {      
@@ -283,6 +389,30 @@ class Machine extends Component {
         textDecorationColor: "black"
     }}>{mark.toString().match(/\d+/)[0]}</span>
       </Num>;   
+      case "sOne":
+        return <Num sone onClick={this.checkNum} id={mark}>
+        {mark.toString().match(/\d+/)[0]}
+        </Num>;
+      case "sTwo":
+        return <Num stwo onClick={this.checkNum} id={mark}>
+        {mark.toString().match(/\d+/)[0]}
+        </Num>;
+      case "sThree":
+        return <Num sthree onClick={this.checkNum} id={mark}>
+        {mark.toString().match(/\d+/)[0]}
+        </Num>;
+      case "sFour":
+        return <Num sfour onClick={this.checkNum} id={mark}>
+        {mark.toString().match(/\d+/)[0]}
+        </Num>;
+      case "sFive":
+        return <Num sfive onClick={this.checkNum} id={mark}>
+        {mark.toString().match(/\d+/)[0]}
+        </Num>;
+      case "sSix":
+        return <Num ssix onClick={this.checkNum} id={mark}>
+        {mark.toString().match(/\d+/)[0]}
+        </Num>;          
       default :
       return <Num onClick={this.checkNum} id={mark}>
       {mark.toString().match(/\d+/)[0]}
@@ -290,15 +420,25 @@ class Machine extends Component {
     }
   }
 
-  render() {    
+  render() {        
   return (
     <div>
     <Main>            
       <Explain>이 페이지는 추첨 번호를 랜덤하게 받거나 원하는 번호와 랜덤한 번호를 섞어 반자동 번호 출력을 시뮬레이션할 수 있는 공간입니다.</Explain>
       <Pencils>        
-        <input type="radio" id="deflt" name="checker" onChange={this.changeCheckType} /> 컴퓨터용 사인펜 <br />
+        <input type="radio" id="deflt" name="checker" onChange={this.changeCheckType} /> 고정수 추가 <br />
         <input type="radio" id="pencil" name="checker" onChange={this.changeCheckType} /> 연필 <br />
         <input type="radio" id="without" name="checker" onChange={this.changeCheckType} /> 제외 수 추가<br />        
+        <input type="radio" id="ofNums" name="checker" onChange={this.changeCheckType} /> 구간 추첨 하기<br />        
+        {this.state.checkerType === 'ofNums' ? <div>
+
+      {this.state.ofNumsType.filter((type, idx) => typeof type === 'string').map(data => 
+        this.state.ofNumsType[this.state.ofNumsType.indexOf(data) + 1] !== 0 ?
+        this.ofNumsSelector(data): "")}
+        
+          <input type="button"value="추가하기" onClick={this.addOfNums}/>
+          </div> : ""}
+        
         <input type="checkbox" 
         name="rememberCheck" 
         defaultChecked={true}
@@ -311,7 +451,13 @@ class Machine extends Component {
         mark.toString().indexOf(" ") !== -1 ? 
         this.putNums(mark, " ") : mark.toString().indexOf("c") !== -1 ? 
         this.putNums(mark, "c") : mark.toString().indexOf("x") !== -1 ? 
-        this.putNums(mark, "x") :
+        this.putNums(mark, "x") : mark.toString().indexOf("sOne") !== -1 ? 
+        this.putNums(mark, "sOne") : mark.toString().indexOf("sTwo") !== -1 ? 
+        this.putNums(mark, "sTwo") : mark.toString().indexOf("sThree") !== -1 ? 
+        this.putNums(mark, "sThree") : mark.toString().indexOf("sFour") !== -1 ? 
+        this.putNums(mark, "sFour") : mark.toString().indexOf("sFive") !== -1 ? 
+        this.putNums(mark, "sFive") : mark.toString().indexOf("sSix") !== -1 ? 
+        this.putNums(mark, "sSix") :
         this.putNums(mark)        
       )}
       <Button onClick={this.handleRefresh} >당첨번호 얻기</Button>
@@ -470,7 +616,13 @@ const Num = styled.span`
     padding: 0.5rem 0.25rem 0.5rem 0.25rem;
     color: ${props => props.checked ? "hsl(0, 100%, 100%);" : props.pencil ? "black;" : "red;"}
     background-color: ${props => props.checked ? "hsl(0, 100%, 0%);" :
-    props.pencil ? "grey;" : ";"}
+    props.pencil ? "grey;" : 
+    props.sone ? "hsl(30, 100%, 50%);" :
+    props.stwo ? "hsl(50, 100%, 50%);" :
+    props.sthree ? "hsl(90, 100%, 50%);" :
+    props.sfour ? "hsl(170, 100%, 50%);" :
+    props.sfive ? "hsl(210, 100%, 50%);" :
+    props.ssix ? "hsl(300, 100%, 50%);" :";"}
     border-top-style: solid;
     border-bottom-style: solid;
     border-width: 2px 0px 2px 0px;
@@ -478,8 +630,7 @@ const Num = styled.span`
     cursor: pointer;    
 
     &:hover {
-        background-color: ${props => props.checked ? "hsl(0, 100%, 100%);" : "hsl(60, 100%, 50%);"} 
-        color: ${props => props.checked ? "red;" : ";"}
+        background-color: hsl(60, 100%, 50%);        
     }
 `
 

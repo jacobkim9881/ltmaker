@@ -16,7 +16,8 @@ class Insight2 extends Component {
     state = {
         nums: [],
         colored: [],
-        numSprayed: 'default'
+        numSprayed: 'default',
+        bonus: false
     }
 
     componentDidMount() {
@@ -55,14 +56,16 @@ class Insight2 extends Component {
         switch(type) {
             case 'default':
             return <Nums>{data.round}: {this.state.nums.map(num => 
+                parseInt(data.bonus, 10) === num && this.state.bonus === true ? 
+                <Num bonus id={num}>{num}</Num> :
+                parseInt(data.bonus, 10) === num ||
                 parseInt(data.fst, 10) === num ||
                 parseInt(data.snd, 10) === num ||
                 parseInt(data.trd, 10) === num ||
                 parseInt(data.foth, 10) === num ||
                 parseInt(data.fvth, 10) === num ||
-                parseInt(data.sth, 10) === num ||
-                parseInt(data.bonus, 10) === num ?
-                <Num id={num}>{num}</Num> :
+                parseInt(data.sth, 10) === num ?
+                <Num id={num}>{num}</Num> :                 
                 <HideNum id={num}>{num}</HideNum>
                 )}
             </Nums>
@@ -90,6 +93,7 @@ class Insight2 extends Component {
                     <br/>
                     현재까지 나온 당첨 번호들입니다. 흐린 색의 숫자는 당첨되지 않은 숫자입니다. 
                     <br/><br/>
+                    <input type='checkbox' onChange={() => this.setState({bonus: !this.state.bonus})} />보너스 번호 표시하기
                     {
                     //<input type='radio' onChange={this.setSprayingType} name='width' defaultChecked={true} id='default'/>45자리로 숫자 배치 <br/>
                     //<input type='radio' onChange={this.setSprayingType} name='width' id='seven'/>7자리로 숫자 배치 <br/>
@@ -123,7 +127,7 @@ const Num = styled.span`
     width: 30px;
     height: 28px;
     text-align: center;
-    background-color: hsl(0, 100%, 80%);
+    background-color: ${props => props.bonus? "yellow;" : "hsl(0, 100%, 80%);"} 
     font-size: 25px;
     cursor: pointer;
     margin: 0px;
