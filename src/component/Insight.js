@@ -260,21 +260,27 @@ class Insight extends Component {
 export default Insight;
 
 const Consoles = styled.form`
+@media screen and (min-width: 480px) {
     display: block;
     width: 100%;
     position: absolute;
     left: 10%;
     top: 20%;
+    margin-top: 0px;
+}
+    margin-top: 100px;
 `
 
 const Rounds = styled.ul`
 @media screen and (min-width: 480px) {
     left: 10%;
+    margin-top: 0px;
 }
     display: block;
     width: 100%;
     position: absolute;    
     top: 45%;    
+    margin-top: 150px;
 `
 
 const Nums = styled.li`

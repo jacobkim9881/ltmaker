@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import QrReader from 'react-qr-reader'
+import styled from 'styled-components'
  
 class LottoQr extends Component {
   state = {
@@ -18,7 +19,7 @@ class LottoQr extends Component {
   }
   render() {
     return (
-      <div>
+      <Contain>
         <QrReader
           delay={300}
           onError={this.handleError}
@@ -26,9 +27,17 @@ class LottoQr extends Component {
           style={{ width: '100%' }}
         />
         <p>{this.state.result}</p>
-      </div>
+      </Contain>
     )
   }
 }
 
 export default LottoQr;
+
+const Contain = styled.div`
+
+@media screen and (min-width: 480px) { 
+  margin-top: 60px;
+}
+margin-top: 120px;
+`

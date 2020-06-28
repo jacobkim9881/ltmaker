@@ -543,7 +543,12 @@ const Main = styled.div`
 `
 
 const Explain = styled.p`
+@media screen and (min-width: 480px) {  
   padding-left: 50px;
+  margin-top: 0px;
+}
+  padding-left: 50px;
+  margin-top: 120px;
 `
 
 const Button = styled.button`
@@ -731,4 +736,8 @@ const ItemInBox = styled.input`
 
 const Pencils = styled.form`
     padding-left: 50px;
+`
+
+const Pencil = styled.input`
+
 `

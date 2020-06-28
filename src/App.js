@@ -71,9 +71,23 @@ const Nav = styled.div`
     display:block;
     width: 100%;
     position: absolute;
+    padding: 10px;    
     left: 10%;
 `
 
 const StyledLink = styled(Link)`
-    left: 0;
+    left: 0;    
+    text-decoration: none;
+    border: 1px solid hsl(0, 0%, 53%);    
+    box-shadow: 1px 3px hsl(0, 0%, 53%);
+    border-radius: 10px;
+    padding: 10px;
+    color: hsl(0, 0%, 0%);
+    line-height: 3;
+    text-align: justify;
+    word-break: break-word;
+
+    &: visited {        
+        color: hsl(0, 0%, 0%);
+    }
 `
