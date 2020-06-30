@@ -116,11 +116,13 @@ class Machine extends Component {
         this.state.ofNumsType[this.state.ofNumsType.indexOf(data) + 1]));    
     
     let poped = [];
-
-    for (let i = 0; i < ofNums.length; i++) {
-      clicked = clicked.concat(ofNums[i][0]);
-      poped.push.apply(poped, ofNums[i][0]);
-      poped.push.apply(poped, ofNums[i][1]);
+    
+    for (let i = 0; i < ofNums.length; i++) {      
+      if (typeof ofNums[i] !== 'undefined') {
+        clicked = clicked.concat(ofNums[i][0]);
+        poped.push.apply(poped, ofNums[i][0]);
+        poped.push.apply(poped, ofNums[i][1]);  
+      }
     }
 
     for (let i = 0; i < poped.length; i++) {

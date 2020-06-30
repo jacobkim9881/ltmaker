@@ -17,6 +17,7 @@ class Insight extends Component {
         this.filterCount = this.filterCount.bind(this);
         this.diffArray = this.diffArray.bind(this);
         this.tempRounds = this.tempRounds.bind(this);
+        this.showEven = this.showEven.bind(this);
     }
 
     state = {
@@ -36,6 +37,10 @@ class Insight extends Component {
             this.setState({arg: e.target.id,
             filtering: 'ten'
             })    
+        } else if (e.target.id === 'total') {
+            this.setState({filtering: 'total'})
+        }  else if (e.target.id === 'even') {
+            this.setState({filtering: 'even'})
         } else {
             this.setState({arg: e.target.id,
             filtering: 'default'})
@@ -98,6 +103,47 @@ class Insight extends Component {
             case 'right' :
             return arg.indexOf(this.getRightOne(data));
         }
+    }
+
+    showEven(data) {
+        let even = 0;
+        let odd = 0;
+        if (parseInt(data.fst, 10) % 2 === 0) {
+            even++
+        } else {
+            odd ++
+        }
+        if (parseInt(data.snd, 10) % 2 === 0) {
+            even++
+        } else {
+            odd ++
+        }
+        if (parseInt(data.trd, 10) % 2 === 0) {
+            even++
+        } else {
+            odd ++
+        }
+        if (parseInt(data.foth, 10) % 2 === 0) {
+            even++
+        } else {
+            odd ++
+        }
+        if (parseInt(data.fvth, 10) % 2 === 0) {
+            even++
+        } else {
+            odd ++
+        }
+        if (parseInt(data.sth, 10) % 2 === 0) {
+            even++
+        } else {
+            odd ++
+        }
+        if (parseInt(data.bonus, 10) % 2 === 0) {
+            even++
+        } else {
+            odd ++
+        }
+        return even;
     }
 
     switchFunc(data, round) {
@@ -192,6 +238,21 @@ class Insight extends Component {
                 {this.switchFunc(data.sth, parseInt(data.round, 10))} + 
                 {this.switchFunc(data.bonus, parseInt(data.round, 10))}
                 </Nums>);          
+            case 'even':
+            return db.map(data => <Nums >
+                <Round 
+                 fClr={data.round} max={db.length}>{data.round}</Round> : 
+                {this.switchFunc(data.fst, parseInt(data.round, 10))
+            },                     
+                {this.switchFunc(data.snd, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.trd, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.foth, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.fvth, parseInt(data.round, 10))}, 
+                {this.switchFunc(data.sth, parseInt(data.round, 10))} + 
+                {this.switchFunc(data.bonus, parseInt(data.round, 10))}
+                {this.showEven(data) >= 4 ? "짝" : "홀"}, 
+                {7 - this.showEven(data)} : {this.showEven(data)}
+                </Nums>);           
             case 'write':
             return db.map(data => <Nums >
                 <Round 
@@ -204,6 +265,26 @@ class Insight extends Component {
                 {this.switchFunc(data.fvth)}, 
                 {this.switchFunc(data.sth)} + 
                 {this.switchFunc(data.bonus)}                
+                </Nums>);
+            case 'total':
+            return db.map(data => <Nums >
+                <Round 
+                 fClr={data.round} max={db.length}>{data.round}</Round> : 
+                <Total color={parseInt(data.fst, 10) + 
+                parseInt(data.snd, 10) +
+                parseInt(data.trd, 10) +
+                parseInt(data.foth, 10) + 
+                parseInt(data.fvth, 10) +
+                parseInt(data.sth, 10) +
+                parseInt(data.bonus, 10)}>
+                    {parseInt(data.fst, 10) + 
+                parseInt(data.snd, 10) +
+                parseInt(data.trd, 10) +
+                parseInt(data.foth, 10) + 
+                parseInt(data.fvth, 10) +
+                parseInt(data.sth, 10) +
+                parseInt(data.bonus, 10)}
+                </Total>
                 </Nums>);
           }
         
@@ -247,6 +328,8 @@ class Insight extends Component {
                     <input type='radio' name="typeArg" id='doubleNum' onClick={this.chooseArg} /> 쌍수 : 각 자리의 수가 같은 숫자들을 강조합니다.<br />                                        
                     <input type='radio' name="typeArg" id='chain' onClick={this.chooseArg} /> 연번 : 숫자를 클릭하면 해당 숫자의 +-1 에 해당하는 숫자들을 강조합니다.<br />                                        
                     <input type='radio' name="typeArg" id='write' onClick={this.chooseArg} /> 이월수 : 각 회차의 +-1 에 해당하는 회차에서 겹치는 숫자들을 강조합니다.<br />                                        
+                    <input type='radio' name="typeArg" id='total' onClick={this.chooseArg} /> 합계 : 각 회차의 합계<br />                                        
+                    <input type='radio' name="typeArg" id='even' onClick={this.chooseArg} /> 홀짝 : 각 회차의 홀짝비율<br />                                        
                     
                 </Consoles>                    
                 <Rounds>
@@ -265,7 +348,7 @@ const Consoles = styled.form`
     width: 100%;
     position: absolute;
     left: 10%;
-    top: 20%;
+    top: 30%;
     margin-top: 0px;
 }
     margin-top: 100px;
@@ -279,7 +362,7 @@ const Rounds = styled.ul`
     display: block;
     width: 100%;
     position: absolute;    
-    top: 45%;    
+    top: 55%;    
     margin-top: 150px;
 `
 
@@ -290,6 +373,14 @@ const Nums = styled.li`
 const Round = styled.span`
     background-color: hsl(
     ${props => ((1 - props.fClr/props.max) * 240)},
+    100%,
+    70%
+)
+`
+
+const Total = styled.span`
+    background-color: hsl(
+    ${props => props.color},
     100%,
     70%
 )
