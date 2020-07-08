@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import Machine from './Machine'
 import Insight from './component/Insight'
 import Insight2 from './component/Insight2'
-import Graph from './component/Graph'
+import Graph from './component/Graph1'
 import LottoQr from './component/LottoQr'
 
 class App extends Component {
@@ -22,8 +22,10 @@ class App extends Component {
                 <Nav>
                 <StyledLink to='/'>로또 번호 제조기</StyledLink> {'\t'}
                 <StyledLink to='insight'>로또 번호 분석</StyledLink> {'\t'}
-                <StyledLink to='history'>로또 통계</StyledLink> {'\t'}                
-                <StyledLink to='graph'>로또 그래프</StyledLink> {'\t'}                
+                <StyledLink to='history'>로또 통계</StyledLink> {'\t'}             
+                {
+                    //<StyledLink to='graph'>로또 그래프</StyledLink> {'\t'}                
+                }                   
                 <StyledLink to='qrcode'>로또 당첨 확인</StyledLink> {'\t'}        
                 </Nav>
                 </HeadOne>

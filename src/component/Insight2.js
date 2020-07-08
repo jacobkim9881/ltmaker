@@ -61,7 +61,7 @@ class Insight2 extends Component {
     numSpraying(data, type, widthNum) {        
         switch(type) {
             case 'default':
-            return <div>
+            return <Contain width={widthNum}>
             <Round>{data.round}</Round>: <Nums width={widthNum}>{this.state.nums.map(num => 
                 parseInt(data.bonus, 10) === num && this.state.bonus === true ? 
                 <Num bonus id={num}>{num}</Num> :
@@ -76,7 +76,7 @@ class Insight2 extends Component {
                 <HideNum id={num}>{num}</HideNum>
                 )}
             </Nums>
-            </div>
+            </Contain>
         }
     }
 
@@ -91,7 +91,9 @@ class Insight2 extends Component {
                     <input type='checkbox' onChange={() => this.setState({bonus: !this.state.bonus})} />보너스 번호 표시하기 <br/>
                     <input type='button' value={3} id='6' onClick={this.setRange} /> <br />
                     <input type='button' value={5} id='10' onClick={this.setRange} /> <br />
+                    <input type='button' value={7} id='13' onClick={this.setRange} /> <br />
                     <input type='button' value={9} id='17' onClick={this.setRange} /> <br />
+                    <input type='button' value={10} id='18' onClick={this.setRange} /> <br />
                     <input type='button' value={15} id='27' onClick={this.setRange} /> <br />
                     <input type='button' value={45} id='90' onClick={this.setRange} /> <br />
                     {
@@ -102,7 +104,7 @@ class Insight2 extends Component {
                     //<input type='radio' onChange={this.setSprayingType} name='width' id='fifteen'/>15자리로 숫자 배치 <br/>
                     //<input type='radio' onChange={this.setSprayingType} name='width' id='twenty'/>20자리로 숫자 배치 <br/>
                     }
-                    {db.filter(data => parseInt(data.round, 10) > 910).map(data => this.numSpraying(data, this.state.numSprayed, this.state.width))                                        
+                    {db.map(data => this.numSpraying(data, this.state.numSprayed, this.state.width))                                        
                     }
                 </History>
             </div>
@@ -113,12 +115,22 @@ class Insight2 extends Component {
 export default Insight2;
 
 const History = styled.ul`
+@media screen and (min-width: 480px) {  
+    width: 1500px;
+    margin-top: 5%;
+}
+width: 100%;
+margin-top: 20%;
+`
 
+const Contain = styled.div`
+    width: ${props => props.width * 18 + "px;"}
+    display: inline-block;
 `
 
 const Nums = styled.li`
-    list-style-type: none;
-    width: ${props => props.width + "%;"}
+    list-style-type: none;    
+    width: ${props => props.width * 18 + "px;"}
 `
 
 const Round = styled.span`

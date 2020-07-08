@@ -236,7 +236,7 @@ class Insight extends Component {
                 {this.switchFunc(data.foth, parseInt(data.round, 10))}, 
                 {this.switchFunc(data.fvth, parseInt(data.round, 10))}, 
                 {this.switchFunc(data.sth, parseInt(data.round, 10))} + 
-                {this.switchFunc(data.bonus, parseInt(data.round, 10))}
+                {this.switchFunc(data.bonus, parseInt(data.round, 10))} 
                 </Nums>);          
             case 'even':
             return db.map(data => <Nums >

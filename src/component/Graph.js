@@ -13,7 +13,7 @@ class Graph extends Component {
 
     state = {
         numArr : [],
-        roundTo : 5
+        roundTo : 100
     }
 
 
@@ -36,13 +36,15 @@ class Graph extends Component {
         firstDB.map(data => numArr.splice(parseInt(data.bonus, 10) - 1, 1, numArr[parseInt(data.bonus, 10) - 1] + 1));
 
         this.setState({numArr : numArr})
+
         console.log(numArr)
+        
 
         this.drawRoundGraph();
     }
 
     drawRoundGraph() {        
-        let numArr = this.state.numArr
+        let numArr = this.state.numArr;
 
         const canvas = this.refs.canvas;
         const ctx = canvas.getContext('2d');        
@@ -54,11 +56,13 @@ class Graph extends Component {
             let y = 300;             
             let TotalNum = 45;
             let pieOfNum = finNum / TotalNum;
-            let targetArr = numArr.filter( (data, idx) => idx < finNum && idx >= startNum );
+            let targetArr = numArr.filter( (data, idx) => idx < finNum - 1 && idx >= startNum - 1 );
+            let maxNum = 0 
 
             let num = 0;
             if(targetArr.length > 0) {
                 num = targetArr.reduce((a, b) => a + b);                    
+                maxNum = numArr.reduce((a, b) => a + b)/2;            
             }            
                     
             if (startNum === 1) {
@@ -74,8 +78,8 @@ class Graph extends Component {
             }            
 
             if(num > 0) {
-                ctx.lineWidth = num * 10;            
-                ctx.strokeStyle = `hsl(${(70 - (8 * num))}, 100%, 50%)`;            
+                ctx.lineWidth = (num/maxNum) * 200;            
+                ctx.strokeStyle = `hsl(${(70 - (70 * num/maxNum))}, 100%, 50%)`;            
             } else {
                 ctx.lineWidth = 1 * 10;            
                 ctx.strokeStyle = `hsl(${8 * num}, 0%, 50%)`;            

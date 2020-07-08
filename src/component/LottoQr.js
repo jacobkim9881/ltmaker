@@ -5,19 +5,22 @@ import styled from 'styled-components'
 class LottoQr extends Component {
   state = {
     result: 'No result',
+    numbers: [],
     test: 'http://m.dhlottery.co.kr/?v=0917q031432363839n000000000000n000000000000n000000000000n0000000000001525257351'
   }
 
   componentDidMount() {
-    let test = this.state.test;
+    let test = this.state.test;    
     let auto = test.match(/q\d{12}/g);
     let byHand = test.match(/m\d{12}/g);    
+    let semiAuto = test.match(/s\d{12}/g);    
   }
  
-  handleScan = data => {
+  handleScan = data => {        
     if (data) {
       this.setState({
-        result: data
+        result: data,
+        numbers: data.match(/\w\d{12}/g)
       })
     }
   }
@@ -26,8 +29,8 @@ class LottoQr extends Component {
   }
   render() {
     return (
-      <Contain>
-        {this.state.result !== 'No result' ? <iframe width='100%' height='800px' src={this.state.result} >          
+      <Contain>        
+        {this.state.result !== 'No result' ? <iframe title='qrToSite' width='100%' height='800px' src={this.state.result} >          
         </iframe> : ""}        
         <QrReader
           delay={300}
