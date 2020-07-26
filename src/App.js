@@ -24,8 +24,8 @@ class App extends Component {
                 <StyledLink to='insight'>로또 번호 분석</StyledLink> {'\t'}
                 <StyledLink to='history'>로또 통계</StyledLink> {'\t'}             
                 {
-                 //   <StyledLink to='graph'>로또 그래프</StyledLink> {'\t'}                
-                }                
+                 //  <StyledLink to='graph'>로또 그래프</StyledLink> {'\t'}                
+                }             
                 <StyledLink to='qrcode'>로또 당첨 확인</StyledLink> {'\t'}        
                 </Nav>
                 </HeadOne>
