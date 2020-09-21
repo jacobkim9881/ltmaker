@@ -1,0 +1,2 @@
+at src folder
+csvtojson history.csv > text.json
